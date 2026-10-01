@@ -36,6 +36,37 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Tenant",
+      "item": [
+        {
+          "name": "Post signUp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"lastName\": \"Dupont\",\r\n  \"firstName\": \"Jean\",\r\n  \"phoneNumber\": \"+242060000000\",\r\n  \"password\": \"Password123!\",\r\n  \"passwordVerify\": \"Password123!\",\r\n  \"email\": \"jean.dupont@example.com\",\r\n  \"city\": \"brazzaville\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{tenant}}/signup",
+              "host": [
+                "{{baseUrl}}{{tenant}}"
+              ],
+              "path": [
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -45,6 +76,10 @@
     },
     {
       "key": "announcer",
+      "value": ""
+    },
+    {
+      "key": "tenant",
       "value": ""
     }
   ]

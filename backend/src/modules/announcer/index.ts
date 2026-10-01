@@ -1,3 +1,3 @@
-import announcerRoutes from "./routes/announcer.routes.ts";
+import announcerRoutes from "./routes/announcer.route.ts";
 
 export { announcerRoutes };

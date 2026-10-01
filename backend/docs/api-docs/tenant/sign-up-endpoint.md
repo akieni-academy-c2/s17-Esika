@@ -1,11 +1,11 @@
-# Inscription d'un annonceur
+# Inscription d'un locataire
 
 ## Endpoint
 
-Permet d'inscrire un nouveau annonceur.
+Permet d'inscrire un nouveau locataire.
 
 - **Méthode HTTP :** `POST`
-- **Route :** `/api/announcer/signup`
+- **Route :** `/api/tenant/signup`
 - **Content-Type :** `application/json`
 
 ## Body attendu
