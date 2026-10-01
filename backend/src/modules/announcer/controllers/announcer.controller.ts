@@ -14,7 +14,7 @@ const signUpAnnoncer = async (req: Request, res: Response) => {
 	// Champs obligatoires
 	if (
 		!data.firstName ||
-		data.lastName ||
+		!data.lastName ||
 		!data.phoneNumber ||
 		!data.password ||
 		!data.passwordVerify ||
@@ -54,6 +54,11 @@ const signUpAnnoncer = async (req: Request, res: Response) => {
 		password: passwordHash,
 		city,
 	});
+
+    res.status(201).json({
+        message: "Vous êtes inscrit avec succès",
+        status: 201
+    });
 };
 
 export { signUpAnnoncer };
