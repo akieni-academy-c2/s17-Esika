@@ -8,7 +8,7 @@ import AppError from "../../../utils/app-error.ts";
 import { registerAnnouncer } from "../services/announcer.service.ts";
 import bcrypt from "bcrypt";
 
-const signUpAnnoncer = async (req: Request, res: Response) => {
+const signUpAnnouncer = async (req: Request, res: Response) => {
 	const data: registerData = req.body;
 
 	// Champs obligatoires
@@ -55,10 +55,10 @@ const signUpAnnoncer = async (req: Request, res: Response) => {
 		city,
 	});
 
-    res.status(201).json({
-        message: "Vous êtes inscrit avec succès",
-        status: 201
-    });
+	res.status(201).json({
+		message: "Vous êtes inscrit avec succès",
+		status: 201,
+	});
 };
 
-export { signUpAnnoncer };
+export { signUpAnnouncer };

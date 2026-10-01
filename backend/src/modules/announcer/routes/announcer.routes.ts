@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { signUpAnnoncer } from "../controllers/announcer.controller.ts";
+import { signUpAnnouncer } from "../controllers/announcer.controller.ts";
 
 const router = Router();
 
-router.post("/signup", signUpAnnoncer);
+router.post("/signup", signUpAnnouncer);
 
 export default router;

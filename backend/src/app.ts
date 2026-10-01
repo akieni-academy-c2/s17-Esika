@@ -3,8 +3,11 @@ import logger from "./middleware/logger.middleware.ts";
 import notFound from "./middleware/not-found.middlware.ts";
 import errorHandler from "./middleware/error-handler.middleware.ts";
 import { announcerRoutes } from "./modules/announcer/index.ts";
+import cors from "cors";
 
 const app: Express = express();
+
+app.use(cors());
 
 app.use(express.json());
 
