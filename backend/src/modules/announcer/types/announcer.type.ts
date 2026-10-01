@@ -1,4 +1,4 @@
-type City = "brazzaville" | "pointe-noire";
+export type City = "brazzaville" | "pointe-noire";
 
 export type BodyAnnouncerCreate = {
 	lastName: string;
