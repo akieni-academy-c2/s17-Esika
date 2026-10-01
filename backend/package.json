@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend du projet esika, plateforme de mise en relation.",
+  "license": "ISC",
+  "author": "Virgile Yann",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.ts",
+    "dev": "nodemon src/server.ts"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.3",
+    "nodemon": "^3.1.14",
+    "typescript": "^7.0.2"
+  }
+}
