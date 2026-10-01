@@ -5,10 +5,10 @@ import type {
 	BodyRegisterCreate as registerData,
 } from "../../../types/register.type.ts";
 import AppError from "../../../utils/app-error.ts";
-import { registerAnnouncer } from "../services/announcer.service.ts";
+import { registerTenant } from "../services/tenant.service.ts";
 import bcrypt from "bcrypt";
 
-const signUpAnnouncer = async (req: Request, res: Response) => {
+const signUpTenant = async (req: Request, res: Response) => {
 	const data: registerData = req.body;
 
 	// Champs obligatoires
@@ -46,7 +46,7 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 	const city = data.city.toLowerCase() as City;
 
 	// Enregistrement de l'annonceur
-	await registerAnnouncer({
+	await registerTenant({
 		phoneNumber: data.phoneNumber,
 		lastName: data.lastName,
 		firstName: data.firstName,
@@ -61,4 +61,4 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 	});
 };
 
-export { signUpAnnouncer };
+export { signUpTenant };

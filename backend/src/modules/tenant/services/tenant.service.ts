@@ -1,8 +1,8 @@
 import pool from "../../../config/database.ts";
-import { insertAnnouncer } from "../queries/announcer.query.ts";
+import { insertTenant } from "../queries/tenant.query.ts";
 import type { QueryRegisterCreate as RegisterData } from "../../../types/register.type.ts";
 
-const registerAnnouncer = async ({
+const registerTenant = async ({
 	phoneNumber,
 	lastName,
 	firstName,
@@ -10,7 +10,7 @@ const registerAnnouncer = async ({
 	password,
 	city,
 }: RegisterData) => {
-	await pool.query(insertAnnouncer, [
+	await pool.query(insertTenant, [
 		phoneNumber,
 		lastName,
 		firstName,
@@ -20,4 +20,4 @@ const registerAnnouncer = async ({
 	]);
 };
 
-export { registerAnnouncer };
+export { registerTenant };
