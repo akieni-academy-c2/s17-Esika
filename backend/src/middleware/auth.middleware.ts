@@ -19,7 +19,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     try {
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET!
+            process.env.JWT_SECRET_KEY!
         ) as JwtPayload;
 
         req.user = decoded;
