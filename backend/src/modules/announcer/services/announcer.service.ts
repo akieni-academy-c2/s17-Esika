@@ -26,7 +26,7 @@ const registerAnnouncer = async ({
 	]);
 };
 
-const LoginAnnouncer = async ({phoneNumber, password}: LoginData) => {
+const loginAnnouncer = async ({phoneNumber, password}: LoginData) => {
 	const results = await pool.query(selectAnnouncerByPhoneNumber, [phoneNumber]);
 
 	const announcer = results.rows[0];
@@ -42,4 +42,4 @@ const LoginAnnouncer = async ({phoneNumber, password}: LoginData) => {
 	}
 };
 
-export { registerAnnouncer, LoginAnnouncer };
+export { registerAnnouncer, loginAnnouncer };

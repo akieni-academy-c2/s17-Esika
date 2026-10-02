@@ -5,8 +5,9 @@ import type {
 	BodyRegisterCreate as registerData,
 } from "../../../types/register.type.ts";
 import AppError from "../../../utils/app-error.ts";
-import { registerAnnouncer } from "../services/announcer.service.ts";
+import { registerAnnouncer, loginAnnouncer } from "../services/announcer.service.ts";
 import bcrypt from "bcrypt";
+import type { LoginData } from "../../../types/login.type.ts";
 
 const signUpAnnouncer = async (req: Request, res: Response) => {
 	const data: registerData = req.body;
@@ -26,7 +27,7 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 	// Validation du numéro de téléphone
 	const regexNumber = /^\+?\d{5,15}$/;
 	if (!regexNumber.test(data.phoneNumber)) {
-		throw new AppError(400, "Numéro de téléphone invalide");
+		throw new AppError(400, "Format numéro de téléphone invalide");
 	}
 
 	// Validation du mot de passe
@@ -61,4 +62,26 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 	});
 };
 
-export { signUpAnnouncer };
+const signInAnnouncer = async (req: Request, res: Response) => {
+	const data: LoginData = req.body;
+
+	// Champs obligatoires
+	if (!data.phoneNumber || !data.password) {
+		throw new AppError(400, "Le numéro de téléphone et le mot de passe sont obligatoires");
+	}
+
+		// Validation du numéro de téléphone
+	const regexNumber = /^\+?\d{5,15}$/;
+	if (!regexNumber.test(data.phoneNumber)) {
+		throw new AppError(400, "Format numéro de téléphone invalide");
+	}
+
+	await loginAnnouncer(data);
+
+	res.status(200).json({
+		message: "Connexion réussie",
+		status: 200
+	})
+}
+
+export { signUpAnnouncer, signInAnnouncer };
