@@ -94,6 +94,32 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Post signIn",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phoneNumber\": \"+242060000000\",\r\n  \"password\": \"Password123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{tenant}}/signin",
+              "host": [
+                "{{baseUrl}}{{tenant}}"
+              ],
+              "path": [
+                "signin"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }

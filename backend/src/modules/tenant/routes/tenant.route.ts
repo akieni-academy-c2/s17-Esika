@@ -4,6 +4,6 @@ import { signUpTenant, signInTenant } from "../controllers/tenant.controller.ts"
 const router = Router();
 
 router.post("/signup", signUpTenant);
-router.post("/signup", signInTenant);
+router.post("/signin", signInTenant);
 
 export default router;
