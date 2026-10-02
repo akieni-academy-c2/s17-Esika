@@ -1,0 +1,73 @@
+.pass { padding: 20px 0 56px; color: #211b18; }
+.pass--centre { display: grid; place-items: center; min-height: 40vh; }
+.pass__container { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+.pass h1 { font-size: clamp(24px, 5vw, 32px); margin: 0 0 16px; }
+.pass h2 { font-size: 17px; margin: 0 0 12px; }
+.pass__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.pass__etapes { display: flex; flex-wrap: wrap; gap: 8px 20px; list-style: none; padding: 0; margin: 0 0 20px; font-size: 13px; color: #6b625c; }
+.pass__etape--faite { color: #2d5b4c; }
+.pass__etape--active { color: #211b18; font-weight: 700; }
+
+.pass__grille { display: grid; gap: 24px; }
+
+.pass__annonce { display: flex; gap: 14px; border: 1px solid #e3ddd2; border-radius: 12px; padding: 14px;
+  text-decoration: none; color: inherit; margin-bottom: 16px; }
+.pass__annonce p { margin: 2px 0; font-size: 13px; color: #6b625c; }
+.pass__vignette { flex: 0 0 72px; height: 72px; border-radius: 8px; background: #e0dbd2; }
+
+.pass__offre { background: #211b18; color: #fff; border-radius: 12px; padding: 18px; }
+.pass__offre-tete { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.pass__offre-tete span { font-size: 11px; letter-spacing: 0.12em; color: #f0b8a6; }
+.pass__offre-tete strong { font-size: 26px; }
+.pass__offre ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+
+.pass__paiement, .pass__carte, .pass__conseils, .pass__signaler {
+  background: #fff; border: 1px solid #e3ddd2; border-radius: 16px; padding: 20px; }
+.pass__paiement { box-shadow: 0 8px 24px rgba(33, 27, 24, 0.08); }
+
+.pass__operateurs { border: 0; padding: 0; margin: 0 0 16px; display: grid; gap: 10px; }
+.pass__operateurs label { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #e3ddd2;
+  border-radius: 12px; cursor: pointer; font-weight: 600; }
+.pass__operateurs label.is-actif { border: 2px solid #211b18; }
+.pass__operateurs input { accent-color: #211b18; }
+.pass__sigle { background: #e0dbd2; border-radius: 6px; padding: 4px 8px; font-size: 11px; }
+
+.pass__champ { display: block; font-size: 13px; color: #6b625c; margin-bottom: 6px; }
+.pass__tel { display: flex; align-items: center; border: 1px solid #cfc8bc; border-radius: 10px; overflow: hidden; }
+.pass__tel:focus-within { outline: 2px solid #ad4630; outline-offset: 1px; }
+.pass__tel span { padding: 0 12px; font-weight: 600; border-right: 1px solid #e3ddd2; }
+.pass__tel input { flex: 1; border: 0; padding: 14px 12px; font: inherit; min-width: 0; outline: none; }
+.pass__erreur { min-height: 18px; margin: 6px 0 10px; font-size: 13px; color: #b3261e; }
+.pass__total { display: flex; justify-content: space-between; border-top: 1px solid #e3ddd2; padding: 14px 0; }
+.pass__total strong { font-size: 18px; }
+.pass__demo { border: 1px dashed #b9b2a6; border-radius: 10px; padding: 10px 12px; font-size: 12px; margin: 14px 0 10px; }
+.pass__note { font-size: 12px; color: #6b625c; margin: 0; }
+
+.pass__confirm { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: #e3ece8; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.pass__confirm p { margin: 2px 0 0; font-size: 13px; color: #3d5a50; }
+
+.pass__proprio { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.pass__proprio h1 { font-size: 20px; margin: 0; }
+.pass__proprio p { margin: 2px 0 0; font-size: 13px; color: #6b625c; }
+.pass__avatar { width: 48px; height: 48px; border-radius: 50%; background: #211b18; color: #fff;
+  display: grid; place-items: center; font-weight: 700; text-transform: uppercase; }
+.pass__numero { background: #f4f1ea; border-radius: 10px; padding: 14px; margin-bottom: 14px; display: grid; gap: 4px; }
+.pass__numero strong { font-size: 22px; }
+.pass__numero small { color: #6b625c; }
+.pass__boutons { display: grid; gap: 10px; margin-bottom: 18px; }
+.pass textarea { width: 100%; box-sizing: border-box; border: 1px solid #cfc8bc; border-radius: 10px; padding: 12px;
+  font: inherit; background: #f4f1ea; resize: vertical; }
+
+.pass__aside { display: grid; gap: 16px; align-content: start; }
+.pass__conseils { background: #fcefd9; border-color: #f0dcb4; }
+.pass__conseils ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.pass__signaler p { font-size: 13px; color: #6b625c; }
+.pass__retour { display: block; margin-top: 12px; font-size: 13px; color: #ad4630; text-decoration: none; }
+
+@media (min-width: 900px) {
+  .pass__grille { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+  .pass__grille--contact { grid-template-columns: minmax(0, 1fr) 360px; }
+  .pass__boutons { grid-template-columns: 1fr 1fr; }
+}

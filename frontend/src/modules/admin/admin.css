@@ -1,0 +1,69 @@
+.adm { min-height: 100vh; display: grid; background: #f4f1ea; color: #211b18; }
+.adm__menu { background: #211b18; color: #fff; padding: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.adm__logo { color: #fff; font-weight: 800; letter-spacing: .2em; text-decoration: none; }
+.adm__titre { display: none; font-size: 11px; letter-spacing: .14em; color: #b9b2a6; margin: 0; }
+.adm__menu nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.adm__menu nav a, .adm__bientot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 10px; color: #e8e2d8; text-decoration: none; font-size: 14px; }
+.adm__menu nav a.active { background: #34302d; color: #fff; font-weight: 700; }
+.adm__bientot { opacity: .45; cursor: default; }
+.adm__pastille { background: #ad4630; color: #fff; border-radius: 6px; font-size: 12px; padding: 1px 7px; }
+.adm__logout { margin-left: auto; background: none; border: 0; color: #b9b2a6; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+.adm__contenu { min-width: 0; }
+.adm__centre { display: grid; place-items: center; min-height: 40vh; }
+.adm__entete { background: #fff; border-bottom: 1px solid #e3ddd2; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+.adm__entete h1 { margin: 0; font-size: 22px; }
+.adm__entete p { margin: 2px 0 0; font-size: 13px; color: #6b625c; }
+.adm__recherche { border: 1px solid #cfc8bc; border-radius: 10px; padding: 10px 14px; font: inherit; min-width: 240px; max-width: 100%; }
+.adm__corps { padding: 16px; display: grid; gap: 16px; align-items: start; }
+
+.adm__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.adm__stats button { background: #fff; border: 1px solid #e3ddd2; border-radius: 12px; padding: 14px; text-align: left; font: inherit; cursor: pointer; display: grid; gap: 4px; }
+.adm__stats button.is-actif { border: 2px solid #211b18; padding: 13px; }
+.adm__stats span { font-size: 12px; color: #6b625c; }
+.adm__stats strong { font-size: 26px; }
+.adm__erreur { color: #b3261e; font-size: 13px; min-height: 18px; margin: 8px 0 0; }
+.adm__vide { background: #fff; border-radius: 12px; padding: 32px; text-align: center; color: #6b625c; }
+
+.adm__table { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #e3ddd2; border-radius: 14px; overflow: hidden; }
+.adm__thead { display: none; }
+.adm__ligne { display: grid; gap: 4px; padding: 14px 16px; border-top: 1px solid #eee8de; font-size: 14px; }
+.adm__ligne:first-of-type { border-top: 0; }
+.adm__ligne.is-urgent { box-shadow: inset 3px 0 0 #ad4630; background: #fbf7f2; }
+.adm__ligne.is-actif { background: #f7f3ec; }
+.adm__ligne small { display: block; color: #6b625c; font-size: 12px; }
+.adm__badge { font-style: normal; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; display: inline-block; }
+.adm__badge--urgent { background: #fbe4dd; color: #a33a24; }
+.adm__badge--a_traiter { background: #fcefd9; color: #8a5a00; }
+.adm__badge--en_cours { background: #e3ece8; color: #2d5b4c; }
+.adm__badge--traite { background: #ece8e0; color: #6b625c; }
+.adm__lien { background: none; border: 0; padding: 0; font: inherit; font-size: 13px; font-weight: 700; color: #ad4630; cursor: pointer; text-decoration: none; text-align: left; }
+.adm__lien--centre { text-align: center; padding: 8px; color: #4a423d; font-weight: 600; }
+
+.adm__detail { background: #fff; border: 1px solid #e3ddd2; border-radius: 16px; padding: 18px; display: grid; gap: 12px; }
+.adm__detail-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.adm__detail-tete small { color: #6b625c; font-size: 12px; }
+.adm__detail h2 { margin: 0; font-size: 20px; }
+.adm__annonce { display: flex; gap: 12px; background: #f4f1ea; border-radius: 12px; padding: 12px; }
+.adm__annonce small { display: block; color: #6b625c; font-size: 12px; margin: 2px 0; }
+.adm__vignette { flex: 0 0 48px; height: 48px; border-radius: 8px; background: #e0dbd2; }
+.adm__etiquette { margin: 0; font-size: 12px; color: #6b625c; font-weight: 600; }
+.adm__message { margin: 0; font-size: 14px; color: #4a423d; border-bottom: 1px solid #eee8de; padding-bottom: 12px; }
+.adm__actions { display: grid; gap: 8px; }
+.adm__btn { border: 1px solid #cfc8bc; background: #f4f1ea; color: #211b18; border-radius: 10px; padding: 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.adm__btn--plein { background: #ad4630; border-color: #ad4630; color: #fff; }
+.adm__btn:disabled, .adm__lien:disabled { opacity: .55; cursor: default; }
+.adm__resultat { margin: 0; background: #e3ece8; color: #2d5b4c; border-radius: 10px; padding: 12px; font-size: 14px; }
+
+@media (min-width: 900px) {
+  .adm { grid-template-columns: 230px minmax(0, 1fr); }
+  .adm__menu { flex-direction: column; align-items: stretch; padding: 22px 14px; gap: 14px; position: sticky; top: 0; height: 100vh; box-sizing: border-box; }
+  .adm__titre { display: block; margin-top: 12px; }
+  .adm__menu nav { flex-direction: column; }
+  .adm__logout { margin: auto 0 0; text-align: left; }
+  .adm__entete { padding: 18px 24px; }
+  .adm__corps { padding: 24px; grid-template-columns: minmax(0, 1fr) 340px; }
+  .adm__thead, .adm__ligne { grid-template-columns: 1.6fr 1.6fr 1.2fr 0.9fr 0.7fr; align-items: center; gap: 12px; }
+  .adm__thead { display: grid; padding: 12px 16px; font-size: 12px; color: #6b625c; background: #faf8f4; }
+  .adm__detail { position: sticky; top: 16px; }
+}
