@@ -34,6 +34,35 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Post signIn",
+          "request": {
+            "auth": {
+              "type": "bearer"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phoneNumber\": \"+242060000000\",\r\n  \"password\": \"Password123!\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{announcer}}/signin",
+              "host": [
+                "{{baseUrl}}{{announcer}}"
+              ],
+              "path": [
+                "signin"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
