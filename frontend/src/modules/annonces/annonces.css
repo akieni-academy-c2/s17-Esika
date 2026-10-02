@@ -1,0 +1,50 @@
+/* ===== Page liste des annonces ===== */
+.liste { display: grid; grid-template-columns: 17rem 1fr; gap: 1.5rem; padding-block: 1.5rem; align-items: start; }
+.liste .liste__bouton-filtres { display: none; }
+.liste__entete { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.liste__entete h1 { font-size: 1.5rem; }
+.liste__outils { display: flex; gap: 0.5rem; align-items: center; }
+.liste .banner { margin-bottom: 1rem; }
+.banner--info { background: var(--mint); color: var(--forest); }
+.grid-annonces--liste { grid-template-columns: 1fr; }
+
+/* Filtres */
+.filtres { display: flex; flex-direction: column; gap: 1.1rem; padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius-lg); position: sticky; top: 4.5rem; }
+.filtres__tete { display: flex; justify-content: space-between; align-items: center; }
+.filtres h2 { font-size: 1rem; }
+.filtres fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.filtres legend { padding: 0; margin-bottom: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); }
+.lien { background: none; border: 0; padding: 0; font: inherit; font-size: 0.8rem; color: var(--terracotta); cursor: pointer; }
+.lien:hover { text-decoration: underline; }
+.range { width: 100%; accent-color: var(--terracotta); }
+.check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; }
+.check input { accent-color: var(--terracotta); width: 1rem; height: 1rem; }
+
+/* Pastilles et chips */
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { padding: 0.25rem 0.7rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; font: inherit; font-size: 0.8rem; cursor: pointer; }
+.chip:hover { border-color: var(--ink); }
+.chip--actif { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pastilles { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.pastille { padding: 0.3rem 0.8rem; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: inherit; font-size: 0.8rem; cursor: pointer; }
+
+/* Contrôle segmenté (Brazzaville / Pointe-Noire, Grille / Liste, ...) */
+.segmente { display: inline-flex; padding: 0.2rem; background: var(--sand); border-radius: var(--radius); }
+.segmente button { flex: 1; padding: 0.35rem 0.8rem; border: 0; border-radius: 8px; background: transparent; font: inherit; font-size: 0.85rem; cursor: pointer; }
+.segmente button[aria-pressed="true"] { background: #fff; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+
+/* État vide et pagination */
+.vide { display: flex; flex-direction: column; align-items: flex-start; gap: 0.6rem; padding: 2rem; background: var(--sand); border-radius: var(--radius-lg); }
+.vide p { color: var(--ink-soft); }
+.pagination { display: flex; justify-content: center; gap: 0.4rem; margin-top: 1.5rem; }
+.pagination button { min-width: 2.25rem; height: 2.25rem; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font: inherit; cursor: pointer; }
+.pagination button[aria-current="page"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pagination button:disabled { opacity: 0.4; cursor: default; }
+
+/* Mobile : les filtres s'ouvrent avec un bouton */
+@media (max-width: 900px) {
+  .liste { grid-template-columns: 1fr; }
+  .liste .liste__bouton-filtres { display: inline-flex; justify-self: start; }
+  .filtres { display: none; position: static; }
+  .filtres--ouverts { display: flex; }
+}
