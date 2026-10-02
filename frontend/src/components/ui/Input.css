@@ -1,0 +1,6 @@
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+.field label { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); }
+.field__hint { font-size: 0.75rem; color: var(--muted); }
+.input, .select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font: inherit; color: var(--ink); }
+.input:focus, .select:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 2px rgba(173, 70, 48, 0.25); }
+.select { width: auto; }
