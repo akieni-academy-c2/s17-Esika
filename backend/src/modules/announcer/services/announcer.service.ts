@@ -28,7 +28,7 @@ const registerAnnouncer = async ({
 	]);
 };
 
-const loginAnnouncer = async ({ phoneNumber, password }: LoginData) => {
+const loginAnnouncer = async ({ phoneNumber, password }: LoginData): Promise<string> => {
 	const results = await pool.query(selectAnnouncerByPhoneNumber, [phoneNumber]);
 
 	const announcer = results.rows[0];
@@ -54,9 +54,7 @@ const loginAnnouncer = async ({ phoneNumber, password }: LoginData) => {
 		},
 	);
 
-	return {
-		token,
-	};
+	return token;
 };
 
 export { registerAnnouncer, loginAnnouncer };

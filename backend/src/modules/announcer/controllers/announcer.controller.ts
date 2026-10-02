@@ -76,7 +76,7 @@ const signInAnnouncer = async (req: Request, res: Response) => {
 		throw new AppError(400, "Format numéro de téléphone invalide");
 	}
 
-	const {token} = await loginAnnouncer(data);
+	const token = await loginAnnouncer(data);
 
 	res.status(200).json({
 		message: "Connexion réussie",
