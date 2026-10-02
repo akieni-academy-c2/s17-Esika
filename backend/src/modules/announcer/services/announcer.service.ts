@@ -6,7 +6,9 @@ import {
 import type { QueryRegisterCreate as RegisterData } from "../../../types/register.type.ts";
 import type { LoginData } from "../../../types/login.type.ts";
 import AppError from "../../../utils/app-error.ts";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const registerAnnouncer = async ({
 	phoneNumber,
@@ -26,7 +28,7 @@ const registerAnnouncer = async ({
 	]);
 };
 
-const loginAnnouncer = async ({phoneNumber, password}: LoginData) => {
+const loginAnnouncer = async ({ phoneNumber, password }: LoginData) => {
 	const results = await pool.query(selectAnnouncerByPhoneNumber, [phoneNumber]);
 
 	const announcer = results.rows[0];
@@ -37,9 +39,24 @@ const loginAnnouncer = async ({phoneNumber, password}: LoginData) => {
 
 	const isPasswordValid = bcrypt.compare(password, announcer.password);
 
-	if(!isPasswordValid) {
-		throw new AppError(400, "Mot de passe incorrect")
+	if (!isPasswordValid) {
+		throw new AppError(400, "Mot de passe incorrect");
 	}
+
+	const token = jwt.sign(
+		{
+			userId: announcer.announcer_id,
+			role: "announcer",
+		},
+		process.env.JWT_SECRET_KEY!,
+		{
+			expiresIn: "1h",
+		},
+	);
+
+	return {
+		token,
+	};
 };
 
 export { registerAnnouncer, loginAnnouncer };
