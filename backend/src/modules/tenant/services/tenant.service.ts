@@ -34,7 +34,7 @@ const loginTenant = async ({ phoneNumber, password }: LoginData): Promise<string
 		throw new AppError(404, "Numéro de téléphone inexistant");
 	}
 
-	const isPasswordValid = bcrypt.compare(password, tenant.password);
+	const isPasswordValid = await bcrypt.compare(password, tenant.password);
 
 	if (!isPasswordValid) {
 		throw new AppError(400, "Mot de passe incorrect");

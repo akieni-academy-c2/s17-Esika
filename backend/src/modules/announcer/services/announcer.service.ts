@@ -33,11 +33,14 @@ const loginAnnouncer = async ({ phoneNumber, password }: LoginData): Promise<str
 
 	const announcer = results.rows[0];
 
+	console.log(announcer.password)
+
 	if (!announcer) {
 		throw new AppError(404, "Numéro de téléphone inexistant");
 	}
 
-	const isPasswordValid = bcrypt.compare(password, announcer.password);
+	const isPasswordValid = await bcrypt.compare(password, announcer.password);
+
 
 	if (!isPasswordValid) {
 		throw new AppError(400, "Mot de passe incorrect");
