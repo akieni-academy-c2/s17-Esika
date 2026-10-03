@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { insertAnnounce } from "../queries/announce.query.ts";
 import { insertImage } from "../queries/image.query.ts";
 import type { CreateAnnounce } from "../types/announce.type.ts";
+import { insertEquipment } from "../queries/equipment.query.ts";
 
 const createAnnounce = async (
 	data: CreateAnnounce,
@@ -28,7 +29,17 @@ const createAnnounce = async (
 			data.favorTime,
 		]);
 
-		return result.rows[0];
+		const announce = result.rows[0];
+
+		await pool.query(insertEquipment, [
+			data.equipment.airConditioning,
+			data.equipment.wifi,
+			data.equipment.generator,
+			data.equipment.parking,
+			data.equipment.furnished,
+			data.equipment.securityGuard,
+			announce.announce_id,
+		]);
 	}
 
 	const client = await pool.connect();
@@ -58,13 +69,23 @@ const createAnnounce = async (
 
 		const announce = result.rows[0];
 
+		await client.query(insertEquipment, [
+			data.equipment.airConditioning,
+			data.equipment.wifi,
+			data.equipment.generator,
+			data.equipment.parking,
+			data.equipment.furnished,
+			data.equipment.securityGuard,
+			announce.announce_id,
+		]);
+
 		for (const file of files) {
 			// Normaliser le nom d'un fichier
 			const safeName = file.originalname
 				.normalize("NFD")
 				.replace(/[\u0300-\u036f]/g, "")
 				.replace(/[^a-zA-Z0-9._-]/g, "_");
-            
+
 			const fileName = `${crypto.randomUUID()}-${safeName}`;
 			const storagePath = `${announce.announce_id}/${fileName}`;
 
