@@ -5,6 +5,7 @@ import notFound from "./middleware/not-found.middleware.ts"
 import errorHandler from "./middleware/error-handler.middleware.ts";
 import { announcerRoutes } from "./modules/announcer/index.ts";
 import { tenantRoutes } from "./modules/tenant/index.ts";
+import { publicRoutes } from "./modules/public/index.ts";
 
 const app: Express = express();
 
@@ -17,6 +18,7 @@ app.use(logger);
 // Routes
 app.use("/api/announcer", announcerRoutes);
 app.use("/api/tenant", tenantRoutes);
+app.use("/api/public", publicRoutes);
 
 app.use(notFound);
 

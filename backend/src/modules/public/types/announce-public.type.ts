@@ -1,5 +1,5 @@
 import type { City } from "../../../types/register.type.ts";
-import type { Equipment } from "../../announcer/types/announce.type.ts";
+import type { Equipment } from "../../announcer/index.ts";
 
 export type AnnounceImage = {
     path: string;
