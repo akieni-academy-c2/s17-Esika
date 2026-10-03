@@ -1,4 +1,5 @@
 import type { City } from "../../../types/register.type.ts";
+import type { AnnounceImage } from "../../public/index.ts";
 
 export type Equipment = {
     airConditioning: boolean;
@@ -27,3 +28,33 @@ export type CreateAnnounce = {
     favorTime: string;
     equipment: Equipment
 }
+
+export type AnnounceStatus = "available" | "rented";
+
+export type Announce = {
+    announceId: number;
+    image?: AnnounceImage;
+    type: string;
+    neighborhood: string;
+    city: City;
+    createdAt: Date;
+    rent: number;
+    total: number;
+    status: string;
+    updatedAt: Date;
+};
+
+export type GetAnnouncesParams = {
+    announcerId: number;
+    page: number;
+    limit: number;
+    status?: AnnounceStatus;
+};
+
+export type AnnounceResponse = {
+    data: Announce[];
+    pagination: {
+        total: number;
+        totalPages: number;
+    };
+};

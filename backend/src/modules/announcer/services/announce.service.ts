@@ -1,9 +1,17 @@
 import pool from "../../../config/database.ts";
 import supabase from "../../../config/supabase.ts";
 import crypto from "node:crypto";
-import { insertAnnounce } from "../queries/announce.query.ts";
+import {
+	insertAnnounce,
+	selectAnnounces,
+	countAnnounces,
+} from "../queries/announce.query.ts";
 import { insertImage } from "../queries/image.query.ts";
-import type { CreateAnnounce } from "../types/announce.type.ts";
+import type {
+	CreateAnnounce,
+	AnnounceResponse,
+	GetAnnouncesParams,
+} from "../types/announce.type.ts";
 import { insertEquipment } from "../queries/equipment.query.ts";
 
 const createAnnounce = async (
@@ -136,4 +144,71 @@ const createAnnounce = async (
 	}
 };
 
-export { createAnnounce };
+const getAnnounces = async (
+	params: GetAnnouncesParams,
+): Promise<AnnounceResponse> => {
+	const { announcerId, page, limit, status } = params;
+
+	const conditions: string[] = [];
+	const values: (number | string)[] = [];
+
+	const addCondition = (condition: string, value: number | string) => {
+		values.push(value);
+
+		conditions.push(condition.replace("?", `$${values.length}`));
+	};
+
+	addCondition("a.announcer_id = ?", announcerId);
+
+	if (status) {
+		addCondition("a.status = ?", status);
+	}
+
+	const whereClause =
+		conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+
+	const offset = (page - 1) * limit;
+
+	const query = `
+        ${selectAnnounces}
+        ${whereClause}
+        ORDER BY a.created_at DESC
+        LIMIT $${values.length + 1}
+        OFFSET $${values.length + 2}
+    `;
+
+	const queryValues = [...values, limit, offset];
+
+	const countQuery = `
+        ${countAnnounces}
+        ${whereClause}
+    `;
+
+	const [announcesResult, countResult] = await Promise.all([
+		pool.query(query, queryValues),
+		pool.query(countQuery, values),
+	]);
+
+    const total = Number(countResult.rows[0].count);
+
+    return {
+        data: announcesResult.rows.map((announce) =>({
+            announceId: announce.announce_id,
+            image: announce.image,
+            type: announce.type,
+            neighborhood: announce.neighborhood,
+            city: announce.city,
+            createdAt: announce.created_at,
+            rent: Number(announce.rent),
+            total: Number(announce.total),
+            status: announce.status,
+            updatedAt: announce.updated_at,
+        })),
+        pagination: {
+            total,
+            totalPages: Math.ceil(total/limit)
+        },
+    };
+};
+
+export { createAnnounce, getAnnounces };
