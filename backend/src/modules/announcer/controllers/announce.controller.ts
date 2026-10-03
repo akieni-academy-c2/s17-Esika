@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import AppError from "../../../utils/app-error.ts";
-import type { CreateAnnounce } from "../types/announce.type.ts";
-import { createAnnounce } from "../services/announce.service.ts";
+import type { AnnounceStatus } from "../types/announce.type.ts";
+import { createAnnounce, getAnnounces } from "../services/announce.service.ts";
 import type { City } from "../../../types/register.type.ts";
 
 const sharedAnnounce = async (req: Request, res: Response) => {
@@ -93,4 +93,35 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 	});
 };
 
-export { sharedAnnounce };
+const getMyAnnounces = async (req: Request, res: Response) => {
+    const announcerId = req.user!.userId;
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+        throw new AppError(400, "Les paramètres page et limit doivent être supérieurs à 0");
+    }
+
+    const status = req.query.status as AnnounceStatus | undefined
+
+    if (status !== undefined && status !== "available" && status !== "rented"
+    ) {
+        throw new AppError(400, "Le statut doit être available ou rented");
+    }
+
+    const result = await getAnnounces({
+        announcerId,
+        page,
+        limit,
+        status
+    });
+
+    res.status(200).json({
+        message: "Vos annonces ont été récupérées avec succès",
+        status: 200,
+        ...result
+    });
+}
+
+export { sharedAnnounce, getMyAnnounces };

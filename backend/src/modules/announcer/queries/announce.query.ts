@@ -26,13 +26,11 @@ const selectAnnounces = `
         ) AS image
 
     FROM announces a
-    WHERE a.announcer_id = $1
 `;
 
 const countAnnounces = `
     SELECT COUNT(*)
     FROM announces a
-    WHERE a.announcer_id = $1
 `;
 
 export { insertAnnounce, selectAnnounces, countAnnounces };
