@@ -33,7 +33,7 @@ const createAnnounce = async (
 
 	const client = await pool.connect();
 
-    const uploadedFiles: string[] = [];
+	const uploadedFiles: string[] = [];
 
 	try {
 		await client.query("BEGIN");
@@ -59,12 +59,18 @@ const createAnnounce = async (
 		const announce = result.rows[0];
 
 		for (const file of files) {
-			const fileName = `${crypto.randomUUID()}-${file.originalname}`;
-			const path = `${announce.announce_id}/${fileName}`;
+			// Normaliser le nom d'un fichier
+			const safeName = file.originalname
+				.normalize("NFD")
+				.replace(/[\u0300-\u036f]/g, "")
+				.replace(/[^a-zA-Z0-9._-]/g, "_");
+            
+			const fileName = `${crypto.randomUUID()}-${safeName}`;
+			const storagePath = `${announce.announce_id}/${fileName}`;
 
 			const { error } = await supabase.storage
 				.from("announce")
-				.upload(path, file.buffer, {
+				.upload(storagePath, file.buffer, {
 					contentType: file.mimetype,
 					upsert: false,
 				});
@@ -72,6 +78,12 @@ const createAnnounce = async (
 			if (error) {
 				throw error;
 			}
+
+			const { data } = supabase.storage
+				.from("announce")
+				.getPublicUrl(storagePath);
+
+			const path = data.publicUrl;
 
 			uploadedFiles.push(path);
 		}

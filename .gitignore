@@ -143,4 +143,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 #html de test
-index.html
+text_frontend
