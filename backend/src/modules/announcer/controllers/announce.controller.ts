@@ -5,7 +5,16 @@ import { createAnnounce } from "../services/announce.service.ts";
 import type { City } from "../../../types/register.type.ts";
 
 const sharedAnnounce = async (req: Request, res: Response) => {
-	const data: CreateAnnounce = req.body;
+	const data = req.body;
+
+    const equipment = {
+    airConditioning: data.airConditioning === "true",
+    wifi: data.wifi === "true",
+    generator: data.generator === "true",
+    parking: data.parking === "true",
+    furnished: data.furnished === "true",
+    securityGuard: data.securityGuard === "true",
+};
 
 	// Champs obligatoires
 	if (
@@ -73,6 +82,7 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 			landmark: data.landmark,
 			waterElectricity: data.waterElectricity,
 			favorTime: data.favorTime,
+            equipment,
 		},
 		files,
 	);

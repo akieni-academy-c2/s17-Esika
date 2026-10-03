@@ -1,5 +1,14 @@
 import type { City } from "../../../types/register.type.ts";
 
+export type Equipment = {
+    airConditioning: boolean;
+    wifi: boolean;
+    generator: boolean;
+    parking: boolean;
+    furnished: boolean;
+    securityGuard: boolean;
+};
+
 export type CreateAnnounce = {
     type: string;
     rent: number;
@@ -16,4 +25,5 @@ export type CreateAnnounce = {
     landmark: string;
     waterElectricity?: string;
     favorTime: string;
+    equipment: Equipment
 }
