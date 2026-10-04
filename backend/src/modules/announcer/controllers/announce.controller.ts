@@ -4,6 +4,7 @@ import type { AnnounceStatus } from "../types/announce.type.ts";
 import {
 	createAnnounce,
 	getAnnounces,
+	modifyRentAnnonce,
 	modifyStatusAnnonce,
 } from "../services/announce.service.ts";
 import type { City } from "../../../types/register.type.ts";
@@ -132,13 +133,22 @@ const getMyAnnounces = async (req: Request, res: Response) => {
 
 const updateStatusAnnonce = async (req: Request, res: Response) => {
 	const announceId = Number(req.params.id);
+	const announcerId = req.user!.userId;
 	const { status } = req.body;
 
 	if (!Number.isInteger(announceId) || announceId < 1) {
+		throw new AppError(400, "L'identifiant de l'annonce est invalide");
+	}
+
+	if (status !== "available" && status !== "rented") {
 		throw new AppError(400, "Le statut doit être available ou rented");
 	}
 
-	const statusUpdated = await modifyStatusAnnonce(status, announceId);
+	const statusUpdated = await modifyStatusAnnonce(
+		status,
+		announceId,
+		announcerId,
+	);
 
 	res.status(200).json({
 		message: "Le statut de l'annonce a été mis à jour avec succès",
@@ -147,4 +157,30 @@ const updateStatusAnnonce = async (req: Request, res: Response) => {
 	});
 };
 
-export { sharedAnnounce, getMyAnnounces, updateStatusAnnonce };
+const updateRentAnnonce = async (req: Request, res: Response) => {
+	const announceId = Number(req.params.id);
+	const announcerId = req.user!.userId;
+	const rent = Number(req.body.rent);
+
+	if (!Number.isInteger(announceId) || announceId < 1) {
+		throw new AppError(400, "L'identifiant de l'annonce est invalide");
+	}
+
+	if (!Number.isInteger(rent) || rent < 1) {
+        throw new AppError(400, "Le loyer doit être un nombre entier supérieur à 0");
+    }
+
+	const rentUpdated = await modifyRentAnnonce(
+		rent,
+		announceId,
+		announcerId,
+	);
+
+	res.status(200).json({
+		message: "Le loyer de l'annonce a été mis à jour avec succès",
+		status: 200,
+		data: rentUpdated,
+	});
+};
+
+export { sharedAnnounce, getMyAnnounces, updateStatusAnnonce, updateRentAnnonce };

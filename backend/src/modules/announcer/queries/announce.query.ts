@@ -36,8 +36,15 @@ const countAnnounces = `
 const updatedSatusAnnounce = `
     UPDATE announces 
     SET status = $1, updated_at = NOW() 
-    WHERE announce_id = $2
+    WHERE announce_id = $2 AND announcer_id = $3
     RETURNING status;
 `;
 
-export { insertAnnounce, selectAnnounces, countAnnounces, updatedSatusAnnounce };
+const updatedRentAnnounce = `
+    UPDATE announces 
+    SET rent = $1, updated_at = NOW() 
+    WHERE announce_id = $2 AND announcer_id = $3
+    RETURNING rent;
+`;
+
+export { insertAnnounce, selectAnnounces, countAnnounces, updatedSatusAnnounce, updatedRentAnnounce };

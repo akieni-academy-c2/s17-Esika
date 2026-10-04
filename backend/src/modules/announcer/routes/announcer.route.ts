@@ -9,6 +9,7 @@ import {
 	sharedAnnounce,
 	getMyAnnounces,
 	updateStatusAnnonce,
+	updateRentAnnonce,
 } from "../controllers/announce.controller.ts";
 
 const router = Router();
@@ -23,5 +24,6 @@ router.post(
 );
 router.get("/announces", authenticate, getMyAnnounces);
 router.patch("/announces/:id/status", authenticate, updateStatusAnnonce);
+router.patch("/announces/:id/rent", authenticate, updateRentAnnonce);
 
 export default router;
