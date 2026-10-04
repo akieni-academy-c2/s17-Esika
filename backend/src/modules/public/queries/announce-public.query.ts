@@ -8,7 +8,7 @@ const selectAnnounces = `
         a.neighborhood,
         a.deposit,
         a.advance,
-        a.landmark
+        a.landmark,
 
         (a.rent * a.advance) + (a.rent * a.deposit) AS total_entry,
 
