@@ -16,7 +16,7 @@ export default function ProtectedRoute({ roles }) {
   if (!user) {
     return (
       <Navigate
-        to="/connexion"
+        to={roles?.map(normaliser).includes("proprietaire") ? "/connexion?role=annonceur" : "/connexion"}
         replace
         state={{ from: location.pathname + location.search }}
       />

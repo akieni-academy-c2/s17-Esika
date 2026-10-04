@@ -1,4 +1,15 @@
 import { EQUIPEMENTS } from "../annonceur.data";
+import { IconBolt, IconCar, IconGlobe, IconShield, IconSnow, IconWifi } from "../../../components/ui/Icons.jsx";
+
+const icone = (titre = "") => {
+  const t = titre.toLowerCase();
+  if (t.includes("gardien") || t.includes("sécurité")) return IconShield;
+  if (t.includes("groupe")) return IconBolt;
+  if (t.includes("clim")) return IconSnow;
+  if (t.includes("wi")) return IconWifi;
+  if (t.includes("internet")) return IconGlobe;
+  return IconCar;
+};
 
 export default function EtapeEquipements({ d, maj }) {
   const basculer = (cle) =>
@@ -12,15 +23,19 @@ export default function EtapeEquipements({ d, maj }) {
     <>
       <p className="pub__aide">Les locataires filtrent souvent sur ces critères : soyez précis.</p>
       <ul className="pub__equip">
-        {EQUIPEMENTS.map((e) => (
-          <li key={e.cle}>
-            <label>
-              <span><strong>{e.titre}</strong><small>{e.sous}</small></span>
-              <input type="checkbox" role="switch" checked={d.equipements.includes(e.cle)}
-                onChange={() => basculer(e.cle)} />
-            </label>
-          </li>
-        ))}
+        {EQUIPEMENTS.map((e) => {
+          const Icone = icone(e.titre);
+          return (
+            <li key={e.cle}>
+              <label>
+                <Icone taille={20} />
+                <span className="pub__equip-texte"><strong>{e.titre}</strong><small>{e.sous}</small></span>
+                <input type="checkbox" role="switch" className="interrupteur" checked={d.equipements.includes(e.cle)}
+                  onChange={() => basculer(e.cle)} />
+              </label>
+            </li>
+          );
+        })}
       </ul>
 
       <p className="pub__etiquette">Ameublement</p>

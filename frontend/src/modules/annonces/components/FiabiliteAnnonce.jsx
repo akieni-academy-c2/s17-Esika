@@ -1,14 +1,15 @@
-import Badge from '../../../components/ui/Badge';
 import { tempsRelatif } from '../../../lib/format';
+import { IconCheckCircle, IconShield, IconWarning } from '../../../components/ui/Icons';
 
 export default function FiabiliteAnnonce({ annonce }) {
   const jours = (Date.now() - new Date(annonce.modifieLe).getTime()) / 86400000;
+  const nbPhotos = annonce.nbPhotos ?? annonce.photos?.length ?? 0;
 
   const criteres = [
     {
       ok: !!annonce.numeroVerifie,
       titre: 'Numéro du propriétaire vérifié',
-      detail: 'Confirmé par code SMS à l\'inscription',
+      detail: "Confirmé par code SMS à l'inscription",
     },
     {
       ok: jours <= 7 && annonce.statut !== 'a_confirmer',
@@ -16,8 +17,8 @@ export default function FiabiliteAnnonce({ annonce }) {
       detail: 'Relance automatique chaque semaine',
     },
     {
-      ok: annonce.nbPhotos >= 3,
-      titre: `${annonce.nbPhotos} photos publiées par le propriétaire`,
+      ok: nbPhotos >= 3,
+      titre: `${nbPhotos} photos publiées par le propriétaire`,
       detail: 'Minimum 3 photos exigées',
     },
     {
@@ -34,12 +35,12 @@ export default function FiabiliteAnnonce({ annonce }) {
     <section className="fiabilite" aria-labelledby="fiab-titre">
       <div className="fiabilite__tete">
         <h2 id="fiab-titre">Fiabilité de l'annonce</h2>
-        <Badge variant={score >= 3 ? 'success' : 'warn'}>{niveau}</Badge>
+        <span className={`fiabilite__niveau${score >= 3 ? '' : ' fiabilite__niveau--moyen'}`}><IconShield taille={14} /> {niveau}</span>
       </div>
       <ul className="fiabilite__liste">
         {criteres.map((c) => (
           <li key={c.titre} className={c.ok ? '' : 'fiabilite__ko'}>
-            <span aria-hidden="true">{c.ok ? '✓' : '!'}</span>
+            {c.ok ? <IconCheckCircle taille={18} /> : <IconWarning taille={18} />}
             <div>
               <strong>{c.titre}</strong>
               <small>{c.detail}</small>

@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../../../components/ui/Button.jsx";
+import {
+  IconCheck, IconCheckCircle, IconChat, IconChevronDown, IconClock, IconFlag, IconHome, IconPin, IconSearch, IconWarning, IconX,
+} from "../../../components/ui/Icons.jsx";
+import { useLienPublier } from "../../../hooks/useLiens.js";
 import { formatFCFA } from "../../../lib/format.js";
 import { PASS_DUREE_JOURS, PASS_PRIX, SUPPORT_WHATSAPP } from "../../../config/constants.js";
 import "../contenu.css";
@@ -20,6 +24,7 @@ const FAQ = [
 
 export default function CommentCaMarche() {
   const [aide, setAide] = useState(false);
+  const lienPublier = useLienPublier();
   const whatsapp = `https://wa.me/${String(SUPPORT_WHATSAPP ?? "").replace(/\D/g, "")}`;
 
   return (
@@ -32,7 +37,7 @@ export default function CommentCaMarche() {
           <nav className="ccm__ancres" aria-label="Sur cette page">
             <a href="#parcours">Comment ça marche</a>
             <a href="#pass">Le Pass Contact</a>
-            <a href="#anti-arnaque">Anti-arnaque</a>
+            <a href="#anti-arnaque"><IconWarning taille={14} /> Anti-arnaque</a>
             <a href="#faq">Questions fréquentes</a>
             <a href="#contact">Nous contacter</a>
           </nav>
@@ -47,7 +52,7 @@ export default function CommentCaMarche() {
 
           <div className="ccm__duo">
             <article className="ccm__carte">
-              <h3>Vous cherchez un logement</h3>
+              <h3 className="ccm__titre-carte"><span className="ccm__tuile ccm__tuile--rose"><IconSearch taille={18} /></span> Vous cherchez un logement</h3>
               <ol className="ccm__etapes">
                 <li><strong>Cherchez gratuitement</strong><span>Filtrez par quartier, loyer, équipements (groupe électrogène, gardiennage…). Le total à l'entrée est affiché sur chaque annonce.</span></li>
                 <li><strong>Débloquez le contact</strong><span>Avec un Pass Contact à {formatFCFA(PASS_PRIX)}, valable {PASS_DUREE_JOURS} jours sur toutes les annonces.</span></li>
@@ -57,13 +62,13 @@ export default function CommentCaMarche() {
             </article>
 
             <article className="ccm__carte">
-              <h3>Vous louez un logement</h3>
+              <h3 className="ccm__titre-carte"><span className="ccm__tuile ccm__tuile--vert"><IconHome taille={18} /></span> Vous louez un logement</h3>
               <ol className="ccm__etapes">
-                <li><strong>Créez votre compte</strong><span>Par téléphone, avec un code SMS. Votre numéro vérifié rassure les locataires.</span></li>
-                <li><strong>Publiez en 5 minutes</strong><span>Formulaire guidé, total à l'entrée calculé automatiquement.</span></li>
+                <li><strong>Créez votre compte</strong><span>Par téléphone, avec un mot de passe. Votre numéro vérifié rassure les locataires.</span></li>
+                <li><strong>Publiez en 5 minutes</strong><span>Formulaire guidé, total à l'entrée calculé automatiquement. Un conseiller peut publier avec vous sur WhatsApp.</span></li>
                 <li><strong>Gardez l'annonce à jour</strong><span>Modifiez le prix, confirmez la disponibilité, passez en « Loué » : fini les appels pour un logement déjà pris.</span></li>
               </ol>
-              <Button to="/inscription?role=annonceur" variant="outline">Publier gratuitement</Button>
+              <Button to={lienPublier} variant="outline">Publier gratuitement</Button>
             </article>
           </div>
         </section>
@@ -78,18 +83,18 @@ export default function CommentCaMarche() {
               <span>PASS CONTACT · {PASS_DUREE_JOURS} JOURS</span>
               <strong>{formatFCFA(PASS_PRIX)}</strong>
               <ul>
-                <li>Contact direct de tous les propriétaires</li>
-                <li>Appel et WhatsApp pendant {PASS_DUREE_JOURS} jours</li>
-                <li>Paiement Mobile Money (MTN, Airtel)</li>
+                <li><IconCheck taille={16} /> Contact direct de tous les propriétaires</li>
+                <li><IconCheck taille={16} /> Appel et WhatsApp pendant {PASS_DUREE_JOURS} jours</li>
+                <li><IconCheck taille={16} /> Paiement Mobile Money (MTN, Airtel)</li>
               </ul>
             </div>
             <div className="ccm__bloc ccm__bloc--vert">
-              <h3>Ce que le pass est</h3>
+              <h3><IconCheckCircle taille={18} /> Ce que le pass est</h3>
               <p>L'accès au numéro vérifié des propriétaires, pour organiser vos visites vous-même.</p>
               <p>Un prix fixe et connu d'avance, quel que soit le loyer.</p>
             </div>
             <div className="ccm__bloc">
-              <h3>Ce que le pass n'est pas</h3>
+              <h3><IconX taille={18} /> Ce que le pass n'est pas</h3>
               <p>Ni une réservation, ni un paiement du logement.</p>
               <p>La caution, l'avance et le loyer ne passent jamais par ESIKA.</p>
             </div>
@@ -116,17 +121,17 @@ export default function CommentCaMarche() {
             <div className="ccm__carte">
               <h3>Les signaux d'alerte</h3>
               <ul className="ccm__alertes">
-                <li>On vous demande une avance ou des frais avant la visite</li>
-                <li>Le prix est très inférieur aux autres annonces du quartier</li>
-                <li>Le « propriétaire » est absent et ne peut pas faire visiter</li>
-                <li>On vous presse : « beaucoup de monde est intéressé »</li>
+                <li><IconWarning taille={16} /> On vous demande une avance ou des frais avant la visite</li>
+                <li><IconWarning taille={16} /> Le prix est très inférieur aux autres annonces du quartier</li>
+                <li><IconWarning taille={16} /> Le « propriétaire » est absent et ne peut pas faire visiter</li>
+                <li><IconWarning taille={16} /> On vous presse : « beaucoup de monde est intéressé »</li>
               </ul>
             </div>
             <div className="ccm__carte ccm__carte--noire">
               <h3>Un doute ? Signalez l'annonce</h3>
               <p>Bouton « Signaler » sur chaque annonce. L'équipe ESIKA vérifie et peut masquer l'annonce.</p>
               <button type="button" className="ccm__btn-blanc" aria-expanded={aide} onClick={() => setAide(!aide)}>
-                Comment signaler
+                <IconFlag taille={15} /> Comment signaler
               </button>
               {aide && (
                 <ol className="ccm__signaler">
@@ -146,8 +151,8 @@ export default function CommentCaMarche() {
             <p className="ccm__lead">Les questions que nous posent le plus souvent locataires et propriétaires.</p>
             <div className="ccm__faq">
               {FAQ.map(([q, r], i) => (
-                <details key={q} open={i === 0}>
-                  <summary>{q}</summary>
+                <details key={q} name="faq" open={i === 0}>
+                  <summary>{q}<IconChevronDown taille={18} /></summary>
                   <p>{r}</p>
                 </details>
               ))}
@@ -157,9 +162,9 @@ export default function CommentCaMarche() {
           <aside id="contact" className="ccm__contact">
             <h3>Nous contacter</h3>
             <p>Une question, un problème avec une annonce ou besoin d'aide pour publier ?</p>
-            <a className="ccm__wa" href={whatsapp} target="_blank" rel="noreferrer">Écrire sur WhatsApp</a>
-            <small>Du lundi au samedi</small>
-            <small>Brazzaville et Pointe-Noire</small>
+            <a className="ccm__wa" href={whatsapp} target="_blank" rel="noreferrer"><IconChat taille={17} /> Écrire sur WhatsApp</a>
+            <small><IconClock taille={14} /> Du lundi au samedi</small>
+            <small><IconPin taille={14} /> Brazzaville et Pointe-Noire</small>
             <Link to="/annonces" className="ccm__lien">Retour aux annonces</Link>
           </aside>
         </section>

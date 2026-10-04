@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { MOTIFS, signalerAnnonce } from "./signalements.service";
+import { IconCheck, IconFlag, IconX } from "../../components/ui/Icons.jsx";
 import "./signalements.css";
 
 export default function SignalerModal({ annonce, ouvert, onFermer }) {
@@ -56,13 +57,15 @@ export default function SignalerModal({ annonce, ouvert, onFermer }) {
       <div className="sig__boite" role="dialog" aria-modal="true" aria-labelledby="sig-titre" tabIndex={-1} ref={boite}>
         {envoye ? (
           <div className="sig__fin">
+            <span className="sig__fin-icone"><IconCheck taille={26} /></span>
             <h2 id="sig-titre">Merci, signalement envoyé</h2>
             <p>L'équipe ESIKA vérifie l'annonce et peut la masquer si le problème est confirmé.</p>
             <button type="button" className="sig__btn sig__btn--plein" onClick={onFermer}>Fermer</button>
           </div>
         ) : (
           <form onSubmit={envoyer} noValidate>
-            <h2 id="sig-titre">Signaler l'annonce</h2>
+            <button type="button" className="sig__fermer" onClick={onFermer} aria-label="Fermer"><IconX taille={18} /></button>
+            <h2 id="sig-titre"><IconFlag taille={20} /> Signaler l'annonce</h2>
             <p className="sig__sous">{annonce.titre}</p>
 
             <fieldset className="sig__motifs">

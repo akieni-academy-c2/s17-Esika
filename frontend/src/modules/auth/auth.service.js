@@ -1,71 +1,144 @@
 import apiClient, { USE_MOCKS } from '../../lib/apiClient';
 
-// 'phone' = wireframes (code à 6 chiffres) | 'email' = FRD (code à 4 chiffres)
+// Authentification par téléphone + mot de passe (backend de Virgile : /tenant et /announcer, signup + signin).
+// L'étape « code SMS » de l'inscription est SIMULÉE côté front (aucun SMS réel n'est envoyé).
+// VITE_REAL_AUTH=true : inscription et connexion passent par le vrai backend, le reste du site peut rester en mocks.
 export const ID_MODE = 'phone';
-export const CODE_LONGUEUR = ID_MODE === 'phone' ? 6 : 4;
-export const CODE_MOCK = '123456'.slice(0, CODE_LONGUEUR);
-export const ADMIN_MOCK = '060000000'; // démo : 06 000 0000 ouvre le back-office
+export const CODE_LONGUEUR = 6;
+export const CODE_MOCK = '123456';
+export const ADMIN_MOCK = '060000000'; // démo : 06 000 0000 ouvre le back-office (données admin simulées)
+export const AUTH_REELLE = import.meta.env.VITE_REAL_AUTH === 'true' || !USE_MOCKS;
 
 const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
-const CLE_ATTENTE = 'esika_inscription';
 const initiale = (n) => (n ? n.trim().slice(0, 1).toUpperCase() + '.' : '');
+const VILLES = { brazzaville: 'Brazzaville', 'pointe-noire': 'Pointe-Noire' };
+const CLE_COMPTES = 'esika_comptes_mock';
+const CLE_PROFILS = 'esika_profils'; // nom/prénom saisis à l'inscription (le backend ne les renvoie pas encore à la connexion)
+
+// Profil saisi à l'inscription, gardé en mémoire (jamais écrit sur disque : il contient le mot de passe)
+let enAttente = null;
 
 /** Message lisible pour une erreur axios (message du backend si présent). */
 export function messageErreur(err, defaut) {
+  if (err?.response?.status >= 500) return 'Erreur du serveur. Réessayez dans un instant.';
   if (err?.response?.data?.message) return err.response.data.message;
   if (err?.request && !err.response) return 'Serveur injoignable. Vérifiez que le backend est lancé.';
   return defaut;
 }
 
-/** Envoie le code. profil : { role, prenom, nom, identifiant, ville, email? } (inscription) ou { identifiant } (connexion) */
-export async function demanderCode(payload) {
-  if (USE_MOCKS) {
-    await attendre(600);
-    sessionStorage.setItem(CLE_ATTENTE, JSON.stringify(payload));
-    return { ok: true };
-  }
-  // On garde le profil saisi : il sert à créer le compte à la première vérification
-  sessionStorage.setItem(CLE_ATTENTE, JSON.stringify(payload));
-  const { data } = await apiClient.post('/auth/code', { phoneNumber: payload.identifiant });
-  return data; // { devCode } uniquement si le backend est en DEMO_MODE
+const telephone = (identifiant) => '+242' + identifiant; // 061234567 -> +242061234567
+
+function lireComptes() {
+  try { return JSON.parse(localStorage.getItem(CLE_COMPTES) || '{}'); } catch { return {}; }
 }
 
-/** Vérifie le code et connecte. Retourne { user, token } */
-export async function verifierCode({ identifiant, code }) {
-  if (USE_MOCKS) {
-    await attendre(600);
-    if (code !== CODE_MOCK) throw new Error('CODE_INVALIDE');
-    const attente = JSON.parse(sessionStorage.getItem(CLE_ATTENTE) || '{}');
-    const estAdmin = identifiant === ADMIN_MOCK;
-    const user = {
-      id: 'u-' + identifiant,
-      prenom: estAdmin ? 'Admin' : attente.prenom ?? 'Karine',
-      nom: estAdmin ? 'ESIKA' : initiale(attente.nom) || 'M.',
-      identifiant,
-      role: estAdmin ? 'admin' : attente.role ?? 'locataire',
-      numeroVerifie: true,
-    };
-    const token = 'mock-token';
-    localStorage.setItem('esika_user', JSON.stringify(user));
-    localStorage.setItem('esika_token', token);
-    sessionStorage.removeItem(CLE_ATTENTE);
-    return { user, token };
-  }
-  const attente = JSON.parse(sessionStorage.getItem(CLE_ATTENTE) || '{}');
-  const profil = attente.identifiant === identifiant ? attente : {};
-  const { data } = await apiClient.post('/auth/verify', {
-    phoneNumber: identifiant,
-    code,
-    role: profil.role,
-    firstName: profil.prenom,
-    lastName: profil.nom,
-    city: profil.ville,
-  });
-  const user = { ...data.user, identifiant: (data.user.telephone ?? identifiant).replace(/^\+242/, ''), numeroVerifie: true };
+function lireProfils() {
+  try { return JSON.parse(localStorage.getItem(CLE_PROFILS) || '{}'); } catch { return {}; }
+}
+
+function ouvrirSession(user, token) {
   localStorage.setItem('esika_user', JSON.stringify(user));
-  localStorage.setItem('esika_token', data.token);
-  sessionStorage.removeItem(CLE_ATTENTE);
-  return { user, token: data.token };
+  localStorage.setItem('esika_token', token);
+  return { user, token };
+}
+
+/** Étape « envoi du code » (simulée). profil : { role, prenom, nom, identifiant, ville, email?, motDePasse } */
+export async function demanderCode(profil) {
+  await attendre(500);
+  enAttente = profil;
+  return { ok: true };
+}
+
+/** Vérifie le code (simulé), crée le compte puis connecte. Retourne { user, token } */
+export async function verifierCode({ identifiant, code }) {
+  await attendre(500);
+  if (code !== CODE_MOCK) throw new Error('CODE_INVALIDE');
+  const profil = enAttente;
+  if (!profil || profil.identifiant !== identifiant) throw new Error('INSCRIPTION_EXPIREE');
+
+  if (!AUTH_REELLE) {
+    const comptes = lireComptes();
+    comptes[identifiant] = { prenom: profil.prenom, nom: profil.nom, role: profil.role };
+    localStorage.setItem(CLE_COMPTES, JSON.stringify(comptes));
+    enAttente = null;
+    return ouvrirSession(
+      { id: 'u-' + identifiant, prenom: profil.prenom, nom: initiale(profil.nom), identifiant, role: profil.role, ville: profil.ville, numeroVerifie: true },
+      'mock-token',
+    );
+  }
+
+  try {
+    await apiClient.post(profil.role === 'proprietaire' ? '/announcer/signup' : '/tenant/signup', {
+      firstName: profil.prenom,
+      lastName: profil.nom,
+      phoneNumber: telephone(identifiant),
+      password: profil.motDePasse,
+      passwordVerify: profil.motDePasse,
+      email: profil.email || undefined,
+      city: profil.ville.toLowerCase(),
+    });
+  } catch (err) {
+    // Le backend ne gère pas encore les doublons : il répond 500 quand le numéro existe déjà
+    if (err.response?.status >= 500) {
+      err.response.status = 409;
+      err.response.data = { message: 'Inscription impossible : ce numéro est peut-être déjà inscrit. Essayez de vous connecter.' };
+    }
+    throw err;
+  }
+  const profils = lireProfils();
+  profils[identifiant] = { prenom: profil.prenom, nom: profil.nom, ville: profil.ville };
+  localStorage.setItem(CLE_PROFILS, JSON.stringify(profils));
+  const motDePasse = profil.motDePasse;
+  enAttente = null;
+  return seConnecter({ identifiant, motDePasse, role: profil.role });
+}
+
+/** Connexion par téléphone + mot de passe. Retourne { user, token } */
+export async function seConnecter({ identifiant, motDePasse, role }) {
+  if (!AUTH_REELLE) {
+    await attendre(500);
+    // Démo : le back-office admin est simulé, on l'ouvre avec le numéro 06 000 0000
+    const estAdmin = identifiant === ADMIN_MOCK;
+    const compte = lireComptes()[identifiant];
+    if (!estAdmin && !compte) throw new Error('COMPTE_INCONNU');
+    return ouvrirSession(
+      {
+        id: 'u-' + identifiant,
+        prenom: estAdmin ? 'Admin' : compte.prenom,
+        nom: estAdmin ? 'ESIKA' : initiale(compte.nom),
+        identifiant,
+        role: estAdmin ? 'admin' : compte.role,
+        numeroVerifie: true,
+      },
+      'mock-token',
+    );
+  }
+
+  // Le backend a une route de connexion par rôle : locataire d'abord, puis propriétaire si le numéro est inconnu
+  const ordre = role === 'proprietaire' ? ['announcer', 'tenant'] : ['tenant', 'announcer'];
+  let derniereErreur;
+  for (const r of ordre) {
+    try {
+      const { data } = await apiClient.post(`/${r}/signin`, { phoneNumber: telephone(identifiant), password: motDePasse });
+      // Si le backend ne renvoie pas encore l'utilisateur, on reprend le profil saisi à l'inscription (même navigateur)
+      const u = data.user ?? {};
+      const local = lireProfils()[identifiant] ?? {};
+      const user = {
+        id: u.id,
+        prenom: u.firstName ?? local.prenom ?? 'Utilisateur',
+        nom: initiale(u.lastName ?? local.nom),
+        identifiant,
+        role: r === 'announcer' ? 'proprietaire' : 'locataire',
+        ville: VILLES[u.city] ?? u.city ?? local.ville,
+        numeroVerifie: true,
+      };
+      return ouvrirSession(user, data.token);
+    } catch (err) {
+      if (err.response?.status !== 404) throw err; // mot de passe faux, etc. : on s'arrête
+      derniereErreur = err;
+    }
+  }
+  throw derniereErreur;
 }
 
 export function deconnecter() {
