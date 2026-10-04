@@ -67,7 +67,8 @@ export type AnnounceDetail = {
     advance: number;
     description?: string;
 
-    ownerName: string;
+    lastName: string;
+    firstName: string;
     announceCount: number;
 
     favorTime: string;
