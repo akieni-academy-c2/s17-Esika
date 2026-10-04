@@ -5,7 +5,11 @@ import {
 	signUpAnnouncer,
 	signInAnnouncer,
 } from "../controllers/announcer.controller.ts";
-import { sharedAnnounce, getMyAnnounces } from "../controllers/announce.controller.ts";
+import {
+	sharedAnnounce,
+	getMyAnnounces,
+	updateStatusAnnonce,
+} from "../controllers/announce.controller.ts";
 
 const router = Router();
 
@@ -17,6 +21,7 @@ router.post(
 	upload.array("images", 6),
 	sharedAnnounce,
 );
-router.get('/announces', authenticate, getMyAnnounces);
+router.get("/announces", authenticate, getMyAnnounces);
+router.patch("/announces/:id/status", authenticate, updateStatusAnnonce);
 
 export default router;

@@ -5,14 +5,17 @@ import {
 	insertAnnounce,
 	selectAnnounces,
 	countAnnounces,
+	updatedSatusAnnounce,
 } from "../queries/announce.query.ts";
 import { insertImage } from "../queries/image.query.ts";
 import type {
 	CreateAnnounce,
 	AnnounceResponse,
 	GetAnnouncesParams,
+	AnnounceStatus
 } from "../types/announce.type.ts";
 import { insertEquipment } from "../queries/equipment.query.ts";
+import AppError from "../../../utils/app-error.ts";
 
 const createAnnounce = async (
 	data: CreateAnnounce,
@@ -211,4 +214,16 @@ const getAnnounces = async (
     };
 };
 
-export { createAnnounce, getAnnounces };
+const modifyStatusAnnonce = async(status: AnnounceStatus, announceId: number):Promise<AnnounceStatus> => {
+	const result = await pool.query(updatedSatusAnnounce, [status, announceId]);
+
+	if (result.rows.length === 0) {
+        throw new AppError(404, "Annonce introuvable");
+    }
+
+	const statusUpdated = result.rows[0].status as AnnounceStatus
+
+	return statusUpdated;
+}
+
+export { createAnnounce, getAnnounces, modifyStatusAnnonce };
