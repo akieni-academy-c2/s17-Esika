@@ -1,6 +1,7 @@
 import pool from "../../../config/database.ts";
-import type { AnnounceResponse, GetAnnouncesParams } from "../types/announce-public.type.ts";
-import { selectAnnounces, countAnnounces } from "../queries/announce-public.query.ts";
+import type { AnnounceResponse, GetAnnouncesParams, AnnounceDetail } from "../types/announce-public.type.ts";
+import { selectAnnounces, countAnnounces, selectAnnounceById } from "../queries/announce-public.query.ts";
+import AppError from "../../../utils/app-error.ts";
 
 const getAnnounces = async (
     params: GetAnnouncesParams,
@@ -129,4 +130,45 @@ const getAnnounces = async (
     };
 };
 
-export { getAnnounces };
+const getAnnounceById = async(announceId: number): Promise<AnnounceDetail> => {
+    const result = await pool.query(selectAnnounceById, [announceId]);
+
+    if (result.rows.length === 0) {
+        throw new AppError(404, "Annonce introuvable");
+    }
+
+    const announce = result.rows[0];
+
+    const rent = Number(announce.rent);
+    const advance = Number(announce.advance);
+    const caution = Number(announce.deposit);
+
+    const advanceAmount = rent * advance;
+    const cautionAmount = rent * caution;
+    const totalEntry = advanceAmount + cautionAmount;
+
+    return {
+        announceId,
+        city: announce.city,
+        neighborhood: announce.neighborhood,
+        type: announce.type,
+        availableAt: announce.available_at,
+        updatedAt: announce.updated_at,
+        landmark: announce.landmark,
+        images: announce.images,
+        equipment: announce.equipment,
+        rent,
+        caution,
+        advance,
+        description: announce.description,
+        firstName: announce.first_name,
+        lastName: announce.last_name,
+        announceCount: Number(announce.announce_count),
+        favorTime: announce.favor_time,
+        advanceAmount,
+        cautionAmount,
+        totalEntry,
+    }
+}
+
+export { getAnnounces, getAnnounceById };
