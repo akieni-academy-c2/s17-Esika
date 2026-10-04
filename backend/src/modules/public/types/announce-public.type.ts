@@ -32,6 +32,7 @@ export type Announce = {
     rent: number;
     type: string;
     neighborhood: string;
+    availableAt?: Date;
     landmark: string
     deposit: number;
     advance: number;

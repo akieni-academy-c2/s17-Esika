@@ -3,6 +3,7 @@ import AppError from "../../../utils/app-error.ts";
 import {
 	getAnnounces,
 	getAnnounceById,
+	getLastestAnnounce
 } from "../services/announce-public.service.ts";
 import type { City } from "../../../types/register.type.ts";
 
@@ -102,4 +103,17 @@ const detailAnnounceById = async (req: Request, res: Response) => {
 	});
 };
 
-export { displayAnnounces, detailAnnounceById };
+const displayLatestAnnounces = async (
+    _req: Request,
+    res: Response,
+) => {
+    const announces = await getLastestAnnounce();
+
+    res.status(200).json({
+        message: "Les annonces les plus récentes ont été récupérées avec succès",
+        status: 200,
+        data: announces,
+    });
+};
+
+export { displayAnnounces, detailAnnounceById, displayLatestAnnounces };

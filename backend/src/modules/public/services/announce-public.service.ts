@@ -1,93 +1,98 @@
 import pool from "../../../config/database.ts";
-import type { AnnounceResponse, GetAnnouncesParams, AnnounceDetail } from "../types/announce-public.type.ts";
-import { selectAnnounces, countAnnounces, selectAnnounceById } from "../queries/announce-public.query.ts";
+import type {
+	AnnounceResponse,
+	GetAnnouncesParams,
+	AnnounceDetail,
+	Announce,
+} from "../types/announce-public.type.ts";
+import {
+	selectAnnounces,
+	countAnnounces,
+	selectAnnounceById,
+	selectLatestAnnounces,
+} from "../queries/announce-public.query.ts";
 import AppError from "../../../utils/app-error.ts";
 
 const getAnnounces = async (
-    params: GetAnnouncesParams,
+	params: GetAnnouncesParams,
 ): Promise<AnnounceResponse> => {
-    const {
-        page,
-        limit,
-        city,
-        neighborhood,
-        rent,
-        totalEntry,
-        type,
-        furnished,
-        airConditioning,
-        wifi,
-        generator,
-        parking,
-        securityGuard,
-    } = params;
+	const {
+		page,
+		limit,
+		city,
+		neighborhood,
+		rent,
+		totalEntry,
+		type,
+		furnished,
+		airConditioning,
+		wifi,
+		generator,
+		parking,
+		securityGuard,
+	} = params;
 
-    const conditions: string[] = [];
-    const values: (string | number | boolean)[] = [];
+	const conditions: string[] = [];
+	const values: (string | number | boolean)[] = [];
 
-    const addCondition = (
-        condition: string,
-        value: string | number | boolean,
-    ) => {
-        values.push(value);
-        conditions.push(condition.replace("?", `$${values.length}`));
-    };
+	const addCondition = (
+		condition: string,
+		value: string | number | boolean,
+	) => {
+		values.push(value);
+		conditions.push(condition.replace("?", `$${values.length}`));
+	};
 
-    if (city) {
-        addCondition("a.city = ?", city);
-    }
+	if (city) {
+		addCondition("a.city = ?", city);
+	}
 
-    if (neighborhood) {
-        addCondition("a.neighborhood = ?", neighborhood);
-    }
+	if (neighborhood) {
+		addCondition("a.neighborhood = ?", neighborhood);
+	}
 
-    if (rent !== undefined) {
-        addCondition("a.rent = ?", rent);
-    }
+	if (rent !== undefined) {
+		addCondition("a.rent = ?", rent);
+	}
 
-    if (totalEntry !== undefined) {
-        addCondition(
-            "(a.rent * a.advance) + (a.rent * a.deposit) = ?",
-            totalEntry,
-        );
-    }
+	if (totalEntry !== undefined) {
+		addCondition("(a.rent * a.advance) + (a.rent * a.deposit) = ?", totalEntry);
+	}
 
-    if (type) {
-        addCondition("a.type = ?", type);
-    }
+	if (type) {
+		addCondition("a.type = ?", type);
+	}
 
-    if (furnished !== undefined) {
-        addCondition("e.furnished = ?", furnished);
-    }
+	if (furnished !== undefined) {
+		addCondition("e.furnished = ?", furnished);
+	}
 
-    if (airConditioning !== undefined) {
-        addCondition("e.air_conditioning = ?", airConditioning);
-    }
+	if (airConditioning !== undefined) {
+		addCondition("e.air_conditioning = ?", airConditioning);
+	}
 
-    if (wifi !== undefined) {
-        addCondition("e.wifi = ?", wifi);
-    }
+	if (wifi !== undefined) {
+		addCondition("e.wifi = ?", wifi);
+	}
 
-    if (generator !== undefined) {
-        addCondition("e.generator = ?", generator);
-    }
+	if (generator !== undefined) {
+		addCondition("e.generator = ?", generator);
+	}
 
-    if (parking !== undefined) {
-        addCondition("e.parking = ?", parking);
-    }
+	if (parking !== undefined) {
+		addCondition("e.parking = ?", parking);
+	}
 
-    if (securityGuard !== undefined) {
-        addCondition("e.security_guard = ?", securityGuard);
-    }
+	if (securityGuard !== undefined) {
+		addCondition("e.security_guard = ?", securityGuard);
+	}
 
-    const whereClause =
-        conditions.length > 0
-            ? ` WHERE ${conditions.join(" AND ")}`
-            : "";
+	const whereClause =
+		conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
 
-    const offset = (page - 1) * limit;
+	const offset = (page - 1) * limit;
 
-    const query = `
+	const query = `
         ${selectAnnounces}
         ${whereClause}
         ORDER BY a.created_at DESC
@@ -95,81 +100,104 @@ const getAnnounces = async (
         OFFSET $${values.length + 2}
     `;
 
-    const queryValues = [...values, limit, offset];
+	const queryValues = [...values, limit, offset];
 
-    const countQuery = `
+	const countQuery = `
         ${countAnnounces}
         ${whereClause}
     `;
 
-    const [announcesResult, countResult] = await Promise.all([
-        pool.query(query, queryValues),
-        pool.query(countQuery, values),
-    ]);
+	const [announcesResult, countResult] = await Promise.all([
+		pool.query(query, queryValues),
+		pool.query(countQuery, values),
+	]);
 
-    const total = Number(countResult.rows[0].count);
+	const total = Number(countResult.rows[0].count);
 
-    return {
-        data: announcesResult.rows.map((announce) => ({
-            announceId: announce.announce_id,
-            image: announce.image,
-            status: announce.status,
-            rent: Number(announce.rent),
-            type: announce.type,
-            neighborhood: announce.neighborhood,
-            landmark: announce.landmark,
-            deposit: Number(announce.deposit),
-            advance: Number(announce.advance),
-            totalEntry: Number(announce.total_entry),
-            equipment: announce.equipment,
-            imageCount: Number(announce.image_count),
-        })),
-        pagination: {
-            total,
-            totalPages: Math.ceil(total / limit),
-        },
-    };
+	return {
+		data: announcesResult.rows.map((announce) => ({
+			announceId: announce.announce_id,
+			image: announce.image,
+			status: announce.status,
+			rent: Number(announce.rent),
+			type: announce.type,
+			neighborhood: announce.neighborhood,
+			landmark: announce.landmark,
+			availableAt: announce.available_at,
+			deposit: Number(announce.deposit),
+			advance: Number(announce.advance),
+			totalEntry: Number(announce.total_entry),
+			equipment: announce.equipment,
+			imageCount: Number(announce.image_count),
+		})),
+		pagination: {
+			total,
+			totalPages: Math.ceil(total / limit),
+		},
+	};
 };
 
-const getAnnounceById = async(announceId: number): Promise<AnnounceDetail> => {
-    const result = await pool.query(selectAnnounceById, [announceId]);
+const getAnnounceById = async (announceId: number): Promise<AnnounceDetail> => {
+	const result = await pool.query(selectAnnounceById, [announceId]);
 
-    if (result.rows.length === 0) {
-        throw new AppError(404, "Annonce introuvable");
-    }
+	if (result.rows.length === 0) {
+		throw new AppError(404, "Annonce introuvable");
+	}
 
-    const announce = result.rows[0];
+	const announce = result.rows[0];
 
-    const rent = Number(announce.rent);
-    const advance = Number(announce.advance);
-    const caution = Number(announce.deposit);
+	const rent = Number(announce.rent);
+	const advance = Number(announce.advance);
+	const caution = Number(announce.deposit);
 
-    const advanceAmount = rent * advance;
-    const cautionAmount = rent * caution;
-    const totalEntry = advanceAmount + cautionAmount;
+	const advanceAmount = rent * advance;
+	const cautionAmount = rent * caution;
+	const totalEntry = advanceAmount + cautionAmount;
 
-    return {
-        announceId,
-        city: announce.city,
-        neighborhood: announce.neighborhood,
-        type: announce.type,
-        availableAt: announce.available_at,
-        updatedAt: announce.updated_at,
-        landmark: announce.landmark,
-        images: announce.images,
-        equipment: announce.equipment,
-        rent,
-        caution,
-        advance,
-        description: announce.description,
-        firstName: announce.first_name,
-        lastName: announce.last_name,
-        announceCount: Number(announce.announce_count),
-        favorTime: announce.favor_time,
-        advanceAmount,
-        cautionAmount,
-        totalEntry,
-    }
-}
+	return {
+		announceId,
+		city: announce.city,
+		neighborhood: announce.neighborhood,
+		type: announce.type,
+		availableAt: announce.available_at,
+		updatedAt: announce.updated_at,
+		landmark: announce.landmark,
+		images: announce.images,
+		equipment: announce.equipment,
+		rent,
+		caution,
+		advance,
+		description: announce.description,
+		firstName: announce.first_name,
+		lastName: announce.last_name,
+		announceCount: Number(announce.announce_count),
+		favorTime: announce.favor_time,
+		advanceAmount,
+		cautionAmount,
+		totalEntry,
+	};
+};
 
-export { getAnnounces, getAnnounceById };
+const getLastestAnnounce = async (): Promise<Announce[]> => {
+	const results = await pool.query(selectLatestAnnounces);
+
+	const announces = results.rows.map((announce) => ({
+		announceId: announce.announce_id,
+		image: announce.image,
+		status: announce.status,
+		rent: Number(announce.rent),
+		type: announce.type,
+		neighborhood: announce.neighborhood,
+		landmark: announce.landmark,
+		availableAt: announce.available_at,
+		deposit: Number(announce.deposit),
+		advance: Number(announce.advance),
+		totalEntry: Number(announce.total_entry),
+		equipment: announce.equipment,
+		imageCount: Number(announce.image_count),
+	}));
+
+    return announces;
+};
+
+export { getAnnounces, getAnnounceById, getLastestAnnounce };

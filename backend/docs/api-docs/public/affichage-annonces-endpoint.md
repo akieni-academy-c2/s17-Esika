@@ -62,6 +62,7 @@ Les équipements sélectionnés sont cumulatifs : `wifi=true&parking=true` reche
 | `rent` | `number` | Montant du loyer |
 | `type` | `string` | Type de logement |
 | `neighborhood` | `string` | Quartier |
+| `availableAt` | `Date` | Date de la disponibilité du logement |
 | `landmark` | `string` | Repère |
 | `deposit` | `number` | Nombre de mois de caution |
 | `advance` | `number` | Nombre de mois d'avance |
@@ -113,6 +114,7 @@ Le frontend n'a pas besoin de recalculer cette valeur.
       "rent": 100000,
       "type": "studio",
       "neighborhood": "Centre-ville",
+      "availableAt": "2024-01-01T00:00:00Z",
       "landmark": "Derrière la poste centrale",
       "deposit": 2,
       "advance": 1,
