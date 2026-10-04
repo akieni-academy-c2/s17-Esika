@@ -116,6 +116,7 @@ const getAnnounces = async (
             rent: Number(announce.rent),
             type: announce.type,
             neighborhood: announce.neighborhood,
+            landmark: announce.landmark,
             deposit: Number(announce.deposit),
             advance: Number(announce.advance),
             totalEntry: Number(announce.total_entry),

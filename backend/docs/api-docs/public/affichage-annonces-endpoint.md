@@ -62,6 +62,7 @@ Les équipements sélectionnés sont cumulatifs : `wifi=true&parking=true` reche
 | `rent` | `number` | Montant du loyer |
 | `type` | `string` | Type de logement |
 | `neighborhood` | `string` | Quartier |
+| `landmark` | `string` | Repère |
 | `deposit` | `number` | Nombre de mois de caution |
 | `advance` | `number` | Nombre de mois d'avance |
 | `totalEntry` | `number` | Montant total à fournir à l'entrée |
@@ -112,6 +113,7 @@ Le frontend n'a pas besoin de recalculer cette valeur.
       "rent": 100000,
       "type": "studio",
       "neighborhood": "Centre-ville",
+      "landmark": "Derrière la poste centrale",
       "deposit": 2,
       "advance": 1,
       "totalEntry": 300000,

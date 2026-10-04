@@ -32,6 +32,7 @@ export type Announce = {
     rent: number;
     type: string;
     neighborhood: string;
+    landmark: string
     deposit: number;
     advance: number;
     totalEntry: number;
