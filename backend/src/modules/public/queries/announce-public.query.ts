@@ -52,4 +52,63 @@ const countAnnounces = `
         ON e.announce_id = a.announce_id
 `;
 
-export {selectAnnounces, countAnnounces}
+const selectAnnounceById = `
+    SELECT
+        a.announce_id,
+        a.city,
+        a.neighborhood,
+        a.type,
+        a.available_at,
+        a.updated_at,
+        a.landmark,
+        a.rent,
+        a.deposit,
+        a.advance,
+        a.description,
+        a.favor_time,
+
+        json_build_object(
+            'airConditioning', e.air_conditioning,
+            'wifi', e.wifi,
+            'generator', e.generator,
+            'parking', e.parking,
+            'furnished', e.furnished,
+            'securityGuard', e.security_guard
+        ) AS equipment,
+
+        (
+            SELECT COALESCE(
+                json_agg(
+                    json_build_object(
+                        'label', i.label,
+                        'path', i.path
+                    )
+                    ORDER BY i.image_id
+                ),
+                '[]'::json
+            )
+            FROM images i
+            WHERE i.announce_id = a.announce_id
+        ) AS images,
+
+        an.last_name,
+        an.first_name,
+
+        (
+            SELECT COUNT(*)
+            FROM announces a2
+            WHERE a2.announcer_id = a.announcer_id
+        ) AS announce_count
+
+    FROM announces a
+
+    LEFT JOIN equipments e
+        ON e.announce_id = a.announce_id
+
+    INNER JOIN announcers an
+        ON an.announcer_id = a.announcer_id
+
+    WHERE a.announce_id = $1
+`;
+
+export {selectAnnounces, countAnnounces, selectAnnounceById}

@@ -49,3 +49,32 @@ export type AnnounceResponse = {
         totalPages: number;
     };
 };
+
+export type AnnounceDetail = {
+    announceId: number;
+    city: City;
+    neighborhood: string;
+    type: string;
+    availableAt?: Date;
+    updatedAt: Date;
+    landmark: string;
+
+    images: AnnounceImage[];
+
+    equipment: Equipment;
+
+    rent: number;
+    caution: number;
+    advance: number;
+    description?: string;
+
+    lastName: string;
+    firstName: string;
+    announceCount: number;
+
+    favorTime: string;
+
+    advanceAmount: number;
+    cautionAmount: number;
+    totalEntry: number;
+};
