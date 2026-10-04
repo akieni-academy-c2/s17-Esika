@@ -6,6 +6,7 @@ import {
 	selectAnnounces,
 	countAnnounces,
 	updatedSatusAnnounce,
+	updatedRentAnnounce,
 } from "../queries/announce.query.ts";
 import { insertImage } from "../queries/image.query.ts";
 import type {
@@ -214,8 +215,8 @@ const getAnnounces = async (
     };
 };
 
-const modifyStatusAnnonce = async(status: AnnounceStatus, announceId: number):Promise<AnnounceStatus> => {
-	const result = await pool.query(updatedSatusAnnounce, [status, announceId]);
+const modifyStatusAnnonce = async(status: AnnounceStatus, announceId: number, announcerId: number):Promise<AnnounceStatus> => {
+	const result = await pool.query(updatedSatusAnnounce, [status, announceId, announcerId]);
 
 	if (result.rows.length === 0) {
         throw new AppError(404, "Annonce introuvable");
@@ -226,4 +227,16 @@ const modifyStatusAnnonce = async(status: AnnounceStatus, announceId: number):Pr
 	return statusUpdated;
 }
 
-export { createAnnounce, getAnnounces, modifyStatusAnnonce };
+const modifyRentAnnonce = async(rent: number, announceId: number, announcerId: number):Promise<AnnounceStatus> => {
+	const result = await pool.query(updatedRentAnnounce, [rent, announceId, announcerId]);
+
+	if (result.rows.length === 0) {
+        throw new AppError(404, "Annonce introuvable");
+    }
+
+	const rentUpdated = result.rows[0].rent
+
+	return rentUpdated;
+}
+
+export { createAnnounce, getAnnounces, modifyStatusAnnonce, modifyRentAnnonce };

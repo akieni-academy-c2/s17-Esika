@@ -25,7 +25,7 @@ const errorHandler: ErrorRequestHandler = (
     console.error(err);
 
     res.status(500).json({
-        message: "An unexpected error occurred(InternalServerError)",
+        message: "Une Erreur interne est servenue(Internal Server Error)",
 		status: 500
     })
 };
