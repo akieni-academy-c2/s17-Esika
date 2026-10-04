@@ -1,10 +1,12 @@
+import { IconBolt, IconCar, IconGlobe, IconShield, IconSnow, IconSofa, IconWifi } from '../../../components/ui/Icons';
+
 const ITEMS = [
-  { cle: 'gardien', titre: 'Gardiennage', sous: 'Portail + clôture' },
-  { cle: 'groupe', titre: 'Groupe électrogène', sous: 'Parties communes' },
-  { cle: 'clim', titre: 'Climatisation', sous: 'Pièce équipée' },
-  { cle: 'parking', titre: 'Parking', sous: 'Place dans la cour' },
-  { cle: 'internet', titre: 'Internet possible', sous: 'Fibre ou box 4G' },
-  { cle: 'wifi', titre: 'Wi-Fi', sous: 'Inclus dans le loyer' },
+  { cle: 'gardien', titre: 'Gardiennage', sous: 'Portail + clôture', Icone: IconShield },
+  { cle: 'groupe', titre: 'Groupe électrogène', sous: 'Parties communes', Icone: IconBolt },
+  { cle: 'clim', titre: 'Climatisation', sous: 'Pièce équipée', Icone: IconSnow },
+  { cle: 'parking', titre: 'Parking', sous: 'Place dans la cour', Icone: IconCar },
+  { cle: 'internet', titre: 'Internet possible', sous: 'Fibre ou box 4G', Icone: IconGlobe },
+  { cle: 'wifi', titre: 'Wi-Fi', sous: 'Inclus dans le loyer', Icone: IconWifi },
 ];
 
 const normaliser = (s) =>
@@ -25,15 +27,21 @@ export default function EquipementsGrid({ equipements = [], meuble }) {
 
   return (
     <ul className="equip">
-      {ITEMS.map((it) => (
-        <li key={it.cle} className={presence[it.cle] ? '' : 'equip__off'}>
-          <strong>{it.titre}</strong>
-          <small>{presence[it.cle] ? it.sous : 'Non inclus'}</small>
+      {ITEMS.map(({ cle, titre, sous, Icone }) => (
+        <li key={cle} className={presence[cle] ? '' : 'equip__off'}>
+          <Icone taille={22} />
+          <div>
+            <strong>{titre}</strong>
+            <small>{presence[cle] ? sous : 'Non inclus'}</small>
+          </div>
         </li>
       ))}
-      <li>
-        <strong>{meuble ? 'Meublé' : 'Non meublé'}</strong>
-        <small>{meuble ? 'Équipé' : 'Cuisine aménagée possible'}</small>
+      <li className={meuble ? '' : 'equip__off'}>
+        <IconSofa taille={22} />
+        <div>
+          <strong>{meuble ? 'Meublé' : 'Non meublé'}</strong>
+          <small>{meuble ? 'Équipé' : 'Cuisine aménagée possible'}</small>
+        </div>
       </li>
     </ul>
   );

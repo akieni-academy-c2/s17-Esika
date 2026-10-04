@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/ui/Badge.jsx";
 import Spinner from "../../../components/ui/Spinner.jsx";
+import { IconCheckCircle, IconClock, IconKey, IconPause, IconPlus, IconTag } from "../../../components/ui/Icons.jsx";
 import { calculerTotalEntree, formatFCFA, tempsRelatif } from "../../../lib/format.js";
 import { changerStatut, confirmerDisponibilite, getMesAnnonces, modifierPrix } from "../annonceur.service";
 import "../annonceur.css";
@@ -79,7 +80,8 @@ export default function MesAnnonces() {
 
         {aConfirmer && (
           <div className="mes__bandeau" role="status">
-            <div>
+            <IconClock taille={22} className="mes__bandeau-icone" />
+            <div className="mes__bandeau-texte">
               <strong>{aConfirmer.titre} : est-il toujours disponible ?</strong>
               <p>Dernière confirmation {tempsRelatif(aConfirmer.modifieLe)}. Sans réponse sous 3 jours, l'annonce est mise en pause.</p>
             </div>
@@ -110,7 +112,7 @@ export default function MesAnnonces() {
         {liste.length === 0 ? (
           <div className="mes__vide">
             <p>{annonces.length === 0 ? "Vous n'avez pas encore publié d'annonce." : "Aucune annonce dans cet onglet."}</p>
-            {annonces.length === 0 && <Link to="/annonceur/publier" className="pub__btn pub__btn--plein">Publier ma première annonce</Link>}
+            {annonces.length === 0 && <Link to="/annonceur/publier" className="btn btn--primary"><IconPlus taille={16} /> Publier ma première annonce</Link>}
           </div>
         ) : (
           <ul className="mes__liste">
@@ -126,7 +128,7 @@ export default function MesAnnonces() {
               return (
                 <li key={a.id} className={`mes__ligne ${a._etat === "loue" ? "is-loue" : ""}`}>
                   <div className="mes__annonce">
-                    <div className="mes__vignette" aria-hidden="true" />
+                    <div className="mes__vignette" aria-hidden="true">{a.photos?.[0] && <img src={a.photos[0]} alt="" />}</div>
                     <div>
                       <Link to={`/annonces/${a.id}`}><strong>{a.titre}</strong></Link>
                       <small>{a.ville}</small>
@@ -154,19 +156,19 @@ export default function MesAnnonces() {
                   <div className="mes__actions">
                     {(a._etat === "en_ligne" || a._etat === "a_confirmer") && (
                       <>
-                        <button type="button" className="mes__chip" onClick={() => { setErreur(""); setEdition({ id: a.id, valeur: String(a.loyer) }); }}>Modifier le prix</button>
-                        <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "pause"))}>Mettre en pause</button>
-                        <button type="button" className="mes__chip mes__chip--rouge" disabled={occupe} onClick={() => passerEnLoue(a)}>Passer en Loué</button>
+                        <button type="button" className="mes__chip" onClick={() => { setErreur(""); setEdition({ id: a.id, valeur: String(a.loyer) }); }}><IconTag taille={14} /> Modifier le prix</button>
+                        <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "pause"))}><IconPause taille={14} /> Mettre en pause</button>
+                        <button type="button" className="mes__chip mes__chip--rouge" disabled={occupe} onClick={() => passerEnLoue(a)}><IconKey taille={14} /> Passer en Loué</button>
                       </>
                     )}
                     {a._etat === "pause" && (
                       <>
-                        <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "disponible"))}>Remettre en ligne</button>
-                        <button type="button" className="mes__chip mes__chip--rouge" disabled={occupe} onClick={() => passerEnLoue(a)}>Passer en Loué</button>
+                        <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "disponible"))}><IconCheckCircle taille={14} /> Remettre en ligne</button>
+                        <button type="button" className="mes__chip mes__chip--rouge" disabled={occupe} onClick={() => passerEnLoue(a)}><IconKey taille={14} /> Passer en Loué</button>
                       </>
                     )}
                     {a._etat === "loue" && (
-                      <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "disponible"))}>Remettre en ligne</button>
+                      <button type="button" className="mes__chip" disabled={occupe} onClick={() => agir(() => changerStatut(a.id, "disponible"))}><IconCheckCircle taille={14} /> Remettre en ligne</button>
                     )}
                   </div>
                 </li>

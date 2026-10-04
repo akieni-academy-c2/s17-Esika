@@ -1,5 +1,6 @@
 import { ELECTRICITE_EAU } from "../annonceur.data";
 import { formatFCFA } from "../../../lib/format";
+import { IconMinus, IconPlus } from "../../../components/ui/Icons.jsx";
 
 function Compteur({ id, label, valeur, min, max, onChange }) {
   return (
@@ -7,10 +8,10 @@ function Compteur({ id, label, valeur, min, max, onChange }) {
       <span id={id}>{label}</span>
       <div role="group" aria-labelledby={id}>
         <button type="button" aria-label={`Moins de mois de ${label.toLowerCase()}`}
-          disabled={valeur <= min} onClick={() => onChange(valeur - 1)}>−</button>
+          disabled={valeur <= min} onClick={() => onChange(valeur - 1)}><IconMinus taille={16} /></button>
         <output aria-live="polite">{valeur} mois</output>
         <button type="button" aria-label={`Plus de mois de ${label.toLowerCase()}`}
-          disabled={valeur >= max} onClick={() => onChange(valeur + 1)}>+</button>
+          disabled={valeur >= max} onClick={() => onChange(valeur + 1)}><IconPlus taille={16} /></button>
       </div>
     </div>
   );

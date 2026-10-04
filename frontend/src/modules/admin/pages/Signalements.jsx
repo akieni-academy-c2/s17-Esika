@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import Spinner from "../../../components/ui/Spinner.jsx";
+import { IconCheckCircle, IconEyeOff, IconFlag, IconPhone, IconSearch } from "../../../components/ui/Icons.jsx";
 import { formatFCFA } from "../../../lib/format.js";
 import { getSignalements, traiterSignalement } from "../admin.service";
 import "../admin.css";
@@ -81,8 +82,11 @@ export default function Signalements() {
           <h1>Signalements</h1>
           <p>Annonces signalées par les locataires</p>
         </div>
-        <input type="search" className="adm__recherche" placeholder="Rechercher une annonce, un motif…"
-          aria-label="Rechercher" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
+        <label className="adm__recherche">
+          <IconSearch taille={17} />
+          <input type="search" placeholder="Rechercher une annonce, un numéro…"
+            aria-label="Rechercher" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
+        </label>
       </header>
 
       <div className="adm__corps">
@@ -109,7 +113,7 @@ export default function Signalements() {
               </li>
               {visibles.map((s) => (
                 <li key={s.id} className={`adm__ligne ${courant?.id === s.id ? "is-actif" : ""} ${etat(s) === "urgent" ? "is-urgent" : ""}`}>
-                  <strong>{s.motifLibelle}</strong>
+                  <strong className="adm__motif"><IconFlag taille={15} /> {s.motifLibelle}</strong>
                   <span>{s.annonceTitre}<small>{s.ville}</small></span>
                   <span>{s.signalePar} · {jour(s.creeLe)}</span>
                   <span><i className={`adm__badge adm__badge--${etat(s)}`}>{BADGES[etat(s)]}</i></span>
@@ -145,10 +149,10 @@ export default function Signalements() {
             ) : (
               <div className="adm__actions">
                 <button type="button" className="adm__btn adm__btn--plein" disabled={occupe}
-                  onClick={() => agir(courant, "traite", "masquee")}>Masquer l'annonce</button>
+                  onClick={() => agir(courant, "traite", "masquee")}><IconEyeOff taille={17} /> Masquer l'annonce</button>
                 <button type="button" className="adm__btn" disabled={occupe || courant.action === "contact"}
                   onClick={() => agir(courant, "en_cours", "contact")}>
-                  {courant.action === "contact" ? "Propriétaire contacté" : "Contacter le propriétaire"}
+                  {courant.action === "contact" ? <><IconCheckCircle taille={17} /> Propriétaire contacté</> : <><IconPhone taille={17} /> Contacter le propriétaire</>}
                 </button>
                 <button type="button" className="adm__lien adm__lien--centre" disabled={occupe}
                   onClick={() => agir(courant, "traite", "sans_suite")}>Classer sans suite</button>

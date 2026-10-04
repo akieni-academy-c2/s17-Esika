@@ -6,6 +6,9 @@ import { formatFCFA } from "../../../lib/format";
 import { brouillonVide, PHOTOS_MAX, PHOTOS_MIN } from "../annonceur.data";
 import { lireBrouillon, publierAnnonce, sauverBrouillon } from "../annonceur.service";
 import { messageErreur } from "../../auth/auth.service";
+import { SUPPORT_WHATSAPP } from "../../../config/constants.js";
+import { lienWhatsApp } from "../../../lib/whatsapp.js";
+import { IconCamera, IconChat, IconCheck, IconCheckCircle, IconEye } from "../../../components/ui/Icons.jsx";
 import EtapeLogement from "../components/EtapeLogement";
 import EtapeLocalisation from "../components/EtapeLocalisation";
 import EtapePrixEntree from "../components/EtapePrixEntree";
@@ -83,6 +86,7 @@ export default function PublierAnnonce() {
   if (publiee) {
     return (
       <div className="pub pub--fin">
+        <span className="pub__fin-icone"><IconCheck taille={28} /></span>
         <h1>Votre annonce est en ligne</h1>
         <p><strong>{publiee.titre}</strong> · {formatFCFA(publiee.loyer)}/mois · entrée {formatFCFA(publiee.loyer * (publiee.cautionMois + publiee.avanceMois))}</p>
         <p>Les locataires voient les changements immédiatement. Si une annonce est signalée, l'équipe ESIKA la vérifie.</p>
@@ -103,16 +107,22 @@ export default function PublierAnnonce() {
       <div className="pub__container">
         <aside className="pub__nav">
           <h1>Publier une annonce</h1>
-          <p className="pub__aide">Environ 5 minutes</p>
+          <p className="pub__aide">Environ 5 minutes · brouillon enregistré à la demande</p>
           <ol>
             {ETAPES.map((e, i) => (
               <li key={e.titre} className={i === etape ? "is-actif" : i < etape ? "is-fait" : ""}
                 aria-current={i === etape ? "step" : undefined}>
-                <span>{i < etape ? "✓" : i + 1}</span>
+                <span>{i < etape ? <IconCheck taille={14} /> : i + 1}</span>
                 <div><strong>{e.titre}</strong><small>{e.sous}</small></div>
               </li>
             ))}
           </ol>
+          <div className="pub__aide-box">
+            <span className="pub__aide-icone"><IconChat taille={18} /></span>
+            <strong>Besoin d'aide ?</strong>
+            <p>Un conseiller ESIKA publie l'annonce avec vous sur WhatsApp.</p>
+            <a href={lienWhatsApp(SUPPORT_WHATSAPP, "Bonjour, je souhaite être accompagné pour publier mon annonce sur ESIKA.")} target="_blank" rel="noreferrer">Être accompagné</a>
+          </div>
         </aside>
 
         <section className="pub__carte">
@@ -140,9 +150,9 @@ export default function PublierAnnonce() {
         </section>
 
         <aside className="pub__apercu" aria-label="Aperçu côté locataire">
-          <p className="pub__aide">Aperçu côté locataire</p>
+          <p className="pub__aide pub__aide--eye"><IconEye taille={15} /> Aperçu côté locataire</p>
           <div className="pub__vignette">
-            {photos[0] ? <img src={photos[0].url} alt="" /> : <span>Photo de couverture</span>}
+            {photos[0] ? <img src={photos[0].url} alt="" /> : <span><IconCamera taille={16} /> Photo de couverture</span>}
           </div>
           <div className="pub__apercu-corps">
             <p><strong>{loyer ? formatFCFA(loyer) : "— FCFA"}</strong> /mois <em>0 commission</em></p>
@@ -154,9 +164,9 @@ export default function PublierAnnonce() {
           <div className="pub__conseils">
             <strong>Conseils pour une annonce fiable</strong>
             <ul>
-              <li>Des photos récentes et lumineuses</li>
-              <li>Un repère connu dans le quartier</li>
-              <li>Mettez à jour le prix dès qu'il change</li>
+              <li><IconCheckCircle taille={16} /> Des photos récentes et lumineuses</li>
+              <li><IconCheckCircle taille={16} /> Un repère connu dans le quartier</li>
+              <li><IconCheckCircle taille={16} /> Mettez à jour le prix dès qu'il change</li>
             </ul>
           </div>
         </aside>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Button from "../../../components/ui/Button.jsx";
+import { IconChevronDown, IconGrid, IconInfo, IconList, IconSearch, IconSliders, IconSort, IconX } from "../../../components/ui/Icons.jsx";
+import { lireVille } from "../../../lib/ville.js";
 import Spinner from "../../../components/ui/Spinner.jsx";
 import AnnonceCard from "../../../components/AnnonceCard.jsx";
 import { formatFCFA } from "../../../lib/format.js";
@@ -12,6 +14,7 @@ const PAR_PAGE = 6;
 
 const DEFAUT = {
   ville: "Brazzaville",
+  q: "",
   quartiers: [],
   loyerMax: "",
   budgetMax: "",
@@ -30,7 +33,8 @@ const DEFAUT = {
 function lireParams(sp) {
   const liste = (cle) => (sp.get(cle) ? sp.get(cle).split(",") : []);
   return {
-    ville: sp.get("ville") || DEFAUT.ville,
+    ville: sp.get("ville") || lireVille(),
+    q: sp.get("q") || "",
     quartiers: liste("quartiers"),
     loyerMax: sp.get("loyerMax") || "",
     budgetMax: sp.get("budgetMax") || "",
@@ -49,6 +53,7 @@ function lireParams(sp) {
 function versParams(f) {
   const p = new URLSearchParams();
   p.set("ville", f.ville);
+  if (f.q) p.set("q", f.q);
   if (f.quartiers.length) p.set("quartiers", f.quartiers.join(","));
   if (f.loyerMax) p.set("loyerMax", f.loyerMax);
   if (f.budgetMax) p.set("budgetMax", f.budgetMax);
@@ -108,81 +113,103 @@ export default function ListeAnnonces() {
   const pageCourante = Math.min(filtres.page, nbPages);
   const visibles = resultats.slice((pageCourante - 1) * PAR_PAGE, pageCourante * PAR_PAGE);
 
+  const rechercher = (e) => {
+    e.preventDefault();
+    changer({ q: String(new FormData(e.currentTarget).get("q") ?? "").trim() });
+  };
+
   return (
-    <div className="container liste">
-      <Button variant="outline" size="sm" className="liste__bouton-filtres" aria-expanded={filtresOuverts} onClick={() => setFiltresOuverts((o) => !o)}>
-        Filtres{pastilles.length > 0 && ` (${pastilles.length})`}
-      </Button>
+    <>
+      <div className="liste-barre">
+        <div className="container liste-barre__inner">
+          <form className="liste-barre__recherche" role="search" onSubmit={rechercher} key={filtres.q}>
+            <IconSearch taille={18} />
+            <label className="sr-only" htmlFor="q">Quartier, repère ou type de logement</label>
+            <input id="q" name="q" defaultValue={filtres.q} placeholder={`${filtres.ville} · quartier, repère…`} autoComplete="off" />
+            {filtres.q && (
+              <button type="button" className="liste-barre__effacer" aria-label="Effacer la recherche" onClick={() => changer({ q: "" })}><IconX taille={16} /></button>
+            )}
+          </form>
 
-      <Filtres filtres={filtres} onChange={changer} onReset={reinitialiser} ouverts={filtresOuverts} />
-
-      <section className="liste__resultats">
-        <header className="liste__entete">
-          <div>
-            <h1>Logements à louer à {filtres.ville}</h1>
-            <p className="muted" aria-live="polite">
-              {chargement ? "Recherche en cours…" : `${total} annonce${total > 1 ? "s" : ""} · total d'entrée calculé pour chaque annonce`}
-            </p>
-          </div>
-          <div className="liste__outils">
-            <label className="sr-only" htmlFor="tri">Trier les annonces</label>
-            <select id="tri" className="select" value={filtres.tri} onChange={(e) => changer({ tri: e.target.value })}>
-              <option value="recentes">Trier : plus récentes</option>
-              <option value="prix_asc">Trier : loyer croissant</option>
-              <option value="prix_desc">Trier : loyer décroissant</option>
-            </select>
-            <div className="segmente" role="group" aria-label="Affichage">
-              <button type="button" aria-pressed={filtres.vue === "grille"} onClick={() => changer({ vue: "grille", page: filtres.page })}>Grille</button>
-              <button type="button" aria-pressed={filtres.vue === "liste"} onClick={() => changer({ vue: "liste", page: filtres.page })}>Liste</button>
-            </div>
-          </div>
-        </header>
-
-        <p className="banner banner--info">
-          Consultation gratuite. Le total à l'entrée (caution + avance) est affiché sur chaque annonce, sans frais de démarcheur.
-        </p>
-
-        {pastilles.length > 0 && (
           <ul className="pastilles" aria-label="Filtres actifs">
             {pastilles.map((p) => (
               <li key={p.libelle}>
                 <button type="button" className="pastille" onClick={() => changer(p.retirer)} aria-label={`Retirer le filtre ${p.libelle}`}>
-                  {p.libelle} <span aria-hidden="true">×</span>
+                  {p.libelle} <IconX taille={13} />
                 </button>
               </li>
             ))}
           </ul>
-        )}
 
-        {chargement && <Spinner />}
-        {erreur && <p className="banner banner--warn">{erreur}</p>}
+          <Button variant="outline" size="sm" className="liste__bouton-filtres" aria-expanded={filtresOuverts} onClick={() => setFiltresOuverts((o) => !o)}>
+            <IconSliders taille={16} /> Filtres{pastilles.length > 0 && ` (${pastilles.length})`}
+          </Button>
 
-        {!chargement && !erreur && total === 0 && (
-          <div className="vide">
-            <h2>Aucune annonce ne correspond</h2>
-            <p>Élargissez le budget ou retirez un filtre pour voir plus de logements.</p>
-            <Button variant="outline" onClick={reinitialiser}>Réinitialiser les filtres</Button>
-          </div>
-        )}
+          <label className="ville-select liste-barre__tri">
+            <span className="sr-only">Trier les annonces</span>
+            <IconSort taille={15} className="ville-select__pin" />
+            <select id="tri" value={filtres.tri} onChange={(e) => changer({ tri: e.target.value })}>
+              <option value="recentes">Trier : plus récentes</option>
+              <option value="prix_asc">Trier : loyer croissant</option>
+              <option value="prix_desc">Trier : loyer décroissant</option>
+            </select>
+            <IconChevronDown taille={14} className="ville-select__fleche" />
+          </label>
+        </div>
+      </div>
 
-        {!chargement && total > 0 && (
-          <div className={`grid-annonces${filtres.vue === "liste" ? " grid-annonces--liste" : ""}`}>
-            {visibles.map((a) => <AnnonceCard key={a.id} annonce={a} />)}
-          </div>
-        )}
+      <div className="container liste">
+        <Filtres filtres={filtres} onChange={changer} onReset={reinitialiser} ouverts={filtresOuverts} onFermer={() => setFiltresOuverts(false)} />
 
-        {!chargement && nbPages > 1 && (
-          <nav className="pagination" aria-label="Pagination">
-            <button type="button" disabled={pageCourante === 1} onClick={() => changer({ page: pageCourante - 1 })} aria-label="Page précédente">‹</button>
-            {Array.from({ length: nbPages }, (_, i) => i + 1).map((n) => (
-              <button key={n} type="button" aria-current={n === pageCourante ? "page" : undefined} onClick={() => changer({ page: n })}>
-                {n}
-              </button>
-            ))}
-            <button type="button" disabled={pageCourante === nbPages} onClick={() => changer({ page: pageCourante + 1 })} aria-label="Page suivante">›</button>
-          </nav>
-        )}
-      </section>
-    </div>
+        <section className="liste__resultats">
+          <header className="liste__entete">
+            <div>
+              <h1>Logements à louer à {filtres.ville}</h1>
+              <p className="muted" aria-live="polite">
+                {chargement ? "Recherche en cours…" : `${total} annonce${total > 1 ? "s" : ""} · total d'entrée calculé pour chaque annonce`}
+              </p>
+            </div>
+            <div className="segmente segmente--vue" role="group" aria-label="Affichage">
+              <button type="button" aria-pressed={filtres.vue === "grille"} onClick={() => changer({ vue: "grille", page: filtres.page })}><IconGrid taille={15} /> Grille</button>
+              <button type="button" aria-pressed={filtres.vue === "liste"} onClick={() => changer({ vue: "liste", page: filtres.page })}><IconList taille={15} /> Liste</button>
+            </div>
+          </header>
+
+          <p className="banner banner--info">
+            <IconInfo taille={18} className="banner__icone" />
+            <span>Consultation gratuite. Le total à l'entrée (caution + avance) est affiché sur chaque annonce, sans frais de démarcheur.</span>
+          </p>
+
+          {chargement && <Spinner />}
+          {erreur && <p className="banner banner--warn">{erreur}</p>}
+
+          {!chargement && !erreur && total === 0 && (
+            <div className="vide">
+              <h2>Aucune annonce ne correspond</h2>
+              <p>Élargissez le budget ou retirez un filtre pour voir plus de logements.</p>
+              <Button variant="outline" onClick={reinitialiser}>Réinitialiser les filtres</Button>
+            </div>
+          )}
+
+          {!chargement && total > 0 && (
+            <div className={`grid-annonces${filtres.vue === "liste" ? " grid-annonces--liste" : ""}`}>
+              {visibles.map((a) => <AnnonceCard key={a.id} annonce={a} />)}
+            </div>
+          )}
+
+          {!chargement && nbPages > 1 && (
+            <nav className="pagination" aria-label="Pagination">
+              <button type="button" disabled={pageCourante === 1} onClick={() => changer({ page: pageCourante - 1 })} aria-label="Page précédente">‹</button>
+              {Array.from({ length: nbPages }, (_, i) => i + 1).map((n) => (
+                <button key={n} type="button" aria-current={n === pageCourante ? "page" : undefined} onClick={() => changer({ page: n })}>
+                  {n}
+                </button>
+              ))}
+              <button type="button" disabled={pageCourante === nbPages} onClick={() => changer({ page: pageCourante + 1 })} aria-label="Page suivante">›</button>
+            </nav>
+          )}
+        </section>
+      </div>
+    </>
   );
 }

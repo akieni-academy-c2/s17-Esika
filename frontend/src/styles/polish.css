@@ -1,0 +1,123 @@
+/* =====================================================================
+   Finitions : états des boutons, transitions entre pages, animations
+   Chargé APRÈS index.css (voir main.jsx). Ne change aucune couleur de la charte.
+   ===================================================================== */
+
+html { -webkit-tap-highlight-color: transparent; }
+body { -webkit-font-smoothing: antialiased; }
+
+/* ---------- Transition entre les pages ---------- */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* "backwards" : l'animation ne laisse aucune transformation une fois finie (pas d'effet sur les éléments collants) */
+main > * { animation: page-in 0.3s ease-out backwards; }
+.page-chargement { min-height: 50vh; display: grid; place-items: center; }
+
+/* ---------- Boutons : transitions et états ---------- */
+.btn, [class*="__btn"], .sig__declencheur, .pub__ajout {
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease, transform 0.12s ease, opacity 0.18s ease;
+}
+.btn { min-height: 2.5rem; }
+.btn--sm { min-height: 2.25rem; }
+.btn--lg { min-height: 3rem; }
+
+/* Survol : légère élévation */
+.btn:not(:disabled):hover,
+[class*="__btn"]:not(:disabled):hover,
+.sig__declencheur:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(33, 27, 24, 0.14);
+}
+/* Clic : le bouton s'enfonce */
+.btn:not(:disabled):active,
+[class*="__btn"]:not(:disabled):active,
+.sig__declencheur:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: none;
+}
+.btn--ghost:not(:disabled):hover { transform: none; box-shadow: none; }
+
+/* Couleurs au survol : boutons à contour */
+.pub__btn:not(:disabled):hover,
+.adm__btn:not(:disabled):hover,
+.sig__btn:not(:disabled):hover,
+.sig__declencheur:hover,
+.ccm__btn-blanc:hover,
+.btn--light:not(:disabled):hover { background: var(--sand); }
+/* … boutons pleins (écrit après, donc prioritaire) */
+.pub__btn--plein:not(:disabled):hover,
+.adm__btn--plein:not(:disabled):hover,
+.sig__btn--plein:not(:disabled):hover { background: var(--terracotta-dark); border-color: var(--terracotta-dark); color: #fff; }
+.pub__btn--noir:not(:disabled):hover { background: #3a322e; border-color: #3a322e; color: #fff; }
+.pub__btn--doux:not(:disabled):hover { background: var(--stone); border-color: var(--stone); }
+.btn--whatsapp:not(:disabled):hover { background: #175f3d; }
+.pub__ajout:hover { border-color: var(--terracotta); color: var(--terracotta); background: #fff7f4; }
+
+/* Désactivé */
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; }
+
+/* ---------- Groupes de choix (puces, segments, pagination, compteurs, onglets) ---------- */
+:where(.pub__chips, .pub__segment, .auth__segment, .segmente, .pagination) button:not([aria-pressed="true"]):not([aria-current="page"]):not(.is-actif):not(:disabled):hover {
+  background-color: var(--sand);
+}
+:where(.pub__chips, .pub__segment, .auth__segment, .segmente, .pagination, .pub__compteur, .mes__onglets, .adm__stats) button {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+:where(.pub__chips, .pub__segment, .auth__segment, .segmente, .pagination, .pub__compteur) button:not(:disabled):active { transform: scale(0.96); }
+.pub__compteur button:not(:disabled):hover { background: #e6e0d4; }
+.mes__onglets button:hover { color: var(--ink); }
+.adm__stats button:hover { border-color: #b9b2a6; transform: translateY(-1px); }
+
+/* ---------- Liens et boutons-liens ---------- */
+a, .auth__lien, .adm__lien, .esp__logout, .adm__logout, .navbar__logout { transition: color 0.15s ease; }
+.adm__lien:hover, .auth__lien:hover, .auth__bas a:hover, .ccm__lien:hover, .pass__retour:hover { text-decoration: underline; }
+.esp__logout:hover { color: var(--ink); }
+.adm__logout:hover { color: #fff; }
+.navbar__links a:hover, .esp__liens a:hover { color: var(--ink); }
+.navbar__links a, .esp__liens a { transition: color 0.15s ease, border-color 0.15s ease; }
+
+/* ---------- Cartes d'annonce ---------- */
+.annonce-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  animation: carte-in 0.35s ease backwards;
+}
+.annonce-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(33, 27, 24, 0.1); border-color: #d6cfc2; }
+@keyframes carte-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.grid-annonces > :nth-child(2) { animation-delay: 0.04s; }
+.grid-annonces > :nth-child(3) { animation-delay: 0.08s; }
+.grid-annonces > :nth-child(4) { animation-delay: 0.12s; }
+.grid-annonces > :nth-child(5) { animation-delay: 0.16s; }
+.grid-annonces > :nth-child(6) { animation-delay: 0.2s; }
+.grid-annonces > :nth-child(n + 7) { animation-delay: 0.24s; }
+
+/* ---------- Champs de formulaire ---------- */
+.auth__input, .auth__tel, .input, .select, .sig__champ, textarea, select {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ---------- Mobile : le menu reste accessible ---------- */
+@media (max-width: 720px) {
+  .navbar__inner { flex-wrap: wrap; gap: 0 0.75rem; padding-block: 0.5rem; }
+  .navbar__actions { flex-wrap: wrap; justify-content: flex-end; }
+  .navbar__actions .btn--outline { display: inline-flex; }
+  .navbar__links { display: flex; order: 3; width: 100%; gap: 1.25rem; margin: 0; overflow-x: auto; }
+  .navbar__links a { padding-block: 0.5rem; white-space: nowrap; }
+}
+@media (max-width: 640px) {
+  .navbar__logout { display: inline; } /* sinon impossible de se déconnecter sur mobile */
+}
+
+/* ---------- Page d'erreur ---------- */
+.erreur-page { max-width: 34rem; margin: 12vh auto 0; padding: 0 1.25rem; text-align: center; }
+.erreur-page h1 { font-size: 1.6rem; margin-bottom: 0.6rem; }
+.erreur-page p { color: var(--ink-soft); }
+.erreur-page__detail { margin-top: 1rem; padding: 0.7rem 0.9rem; border-radius: var(--radius); background: var(--sand); color: var(--ink); font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; word-break: break-word; text-align: left; }
+.erreur-page__actions { display: flex; gap: 0.6rem; justify-content: center; margin-top: 1.4rem; }
+
+/* ---------- Accessibilité : respecter « réduire les animations » ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-delay: 0ms !important; transition-duration: 0.001ms !important; }
+}

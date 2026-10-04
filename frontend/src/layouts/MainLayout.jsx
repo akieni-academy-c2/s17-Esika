@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import PageTransition from "../components/PageTransition.jsx";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 
@@ -7,7 +7,7 @@ export default function MainLayout() {
     <>
       <Navbar />
       <main>
-        <Outlet />
+        <PageTransition />
       </main>
       <Footer />
     </>

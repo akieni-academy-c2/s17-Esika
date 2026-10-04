@@ -23,8 +23,13 @@ const MOTIFS_EQUIPEMENTS = {
   Parking: /parking/i,
 };
 
+// Comparaison sans accents ni majuscules : « moungali » trouve « Moungali »
+const sansAccent = (t = "") => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
 function filtrer(annonces, f = {}) {
   const quartiers = f.quartiers ?? [];
+  // Recherche libre : chaque mot saisi (séparé par une virgule ou un espace) doit apparaître dans l'annonce
+  const mots = sansAccent(f.q).split(/[,\s]+/).filter((m) => m.length > 1);
   const equipements = f.equipements ?? [];
 
   return annonces.filter(
@@ -32,6 +37,7 @@ function filtrer(annonces, f = {}) {
       a.statut === "disponible" &&
       (!f.ville || a.ville === f.ville) &&
       (quartiers.length === 0 || quartiers.includes(a.quartier)) &&
+      (mots.length === 0 || mots.some((m) => sansAccent(`${a.titre} ${a.quartier} ${a.repere}`).includes(m))) &&
       (!f.loyerMax || a.loyer <= Number(f.loyerMax)) &&
       (!f.budgetMax || calculerTotalEntree(a.loyer, a.cautionMois, a.avanceMois) <= Number(f.budgetMax)) &&
       (!f.type || a.type === f.type) &&

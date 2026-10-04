@@ -9,6 +9,8 @@ export const QUARTIERS = {
   "Pointe-Noire": ["Tié-Tié", "Mpita", "Loandjili"],
 };
 
+export const TYPES_LOGEMENT = ["Chambre", "Chambre salon", "Studio", "2 chambres", "3 chambres +", "Maison"];
+
 export const EQUIPEMENTS = [
   "Gardiennage",
   "Groupe électrogène",

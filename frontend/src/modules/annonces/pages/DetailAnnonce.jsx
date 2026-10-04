@@ -10,6 +10,10 @@ import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
 import Spinner from '../../../components/ui/Spinner';
 import { formatFCFA, tempsRelatif, dateCourte } from '../../../lib/format';
+import { basculerFavori, estFavori } from '../../../lib/favoris';
+import {
+  IconBed, IconCamera, IconCheckCircle, IconChevron, IconClock, IconFlag, IconHeart, IconKey, IconLock, IconPin, IconShare, IconShield, IconSofa,
+} from '../../../components/ui/Icons';
 import { PASS_PRIX, PASS_DUREE_JOURS } from '../../../config/constants';
 import '../detail.css';
 import { getPassActif } from '../../passContact/passContact.service';
@@ -21,14 +25,14 @@ export default function DetailAnnonce() {
   const [similaires, setSimilaires] = useState([]);
   const [etat, setEtat] = useState('chargement'); // chargement | ok | introuvable
   const [passActif, setPassActif] = useState(false);
-  const [isSignalerOpen, setIsSignalerOpen] = useState(false);
   const [signaler, setSignaler] = useState(false);
-
+  const [favori, setFavori] = useState(() => estFavori(id));
+  const [lienCopie, setLienCopie] = useState(false);
 
   useEffect(() => {
     let annule = false;
     setEtat('chargement');
-    window.scrollTo(0, 0);
+    setFavori(estFavori(id));
 
     getAnnonceById(id)
       .then(async (a) => {
@@ -49,10 +53,14 @@ export default function DetailAnnonce() {
       })
       .catch(() => !annule && setEtat('introuvable'));
 
+    // Le pass actif décide du bouton affiché (Débloquer / Voir le contact)
+    getPassActif()
+      .then((p) => !annule && setPassActif(!!p))
+      .catch(() => {});
+
     return () => {
       annule = true;
     };
-    getPassActif().then((p) => setPassActif(!!p));
   }, [id]);
 
   if (etat === 'chargement') {
@@ -78,50 +86,62 @@ export default function DetailAnnonce() {
   const avance = a.loyer * a.avanceMois;
   const total = caution + avance;
   const loue = a.statut === 'loue';
+  const nbPhotos = a.nbPhotos ?? a.photos?.length ?? 0;
+  const nomProprio = a.proprietaire?.nom || 'Propriétaire';
+  const initiales = nomProprio.split(/\s+/).slice(0, 2).map((m) => m[0]).join('').toUpperCase();
+  const lienContact = passActif ? `/annonces/${a.id}/contact` : `/annonces/${a.id}/debloquer`;
 
   const dispo =
     a.disponibleLe && new Date(a.disponibleLe) > new Date()
       ? `Disponible dès le ${dateCourte(a.disponibleLe)}`
       : 'Disponible maintenant';
 
+  const partager = async () => {
+    const donnees = { title: a.titre, url: window.location.href };
+    if (navigator.share) {
+      try { await navigator.share(donnees); } catch { /* partage annulé */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(donnees.url);
+      setLienCopie(true);
+      setTimeout(() => setLienCopie(false), 2000);
+    } catch { /* presse-papiers indisponible */ }
+  };
+
   return (
     <div className="detail">
       <div className="detail__container">
-        <nav className="detail__fil" aria-label="Fil d'Ariane">
-          <Link to="/annonces">{a.ville}</Link>
-          <span aria-hidden="true">›</span>
-          <Link to={`/annonces?ville=${encodeURIComponent(a.ville)}`}>{a.quartier}</Link>
-          <span aria-hidden="true">›</span>
-          <span>{a.titre}</span>
-        </nav>
+        <div className="detail__haut">
+          <nav className="detail__fil" aria-label="Fil d'Ariane">
+            <Link to={`/annonces?ville=${encodeURIComponent(a.ville)}`}>{a.ville}</Link>
+            <IconChevron taille={13} />
+            <Link to={`/annonces?ville=${encodeURIComponent(a.ville)}&quartiers=${encodeURIComponent(a.quartier)}`}>{a.quartier}</Link>
+            <IconChevron taille={13} />
+            <span>{a.titre}</span>
+          </nav>
+          <div className="detail__actions">
+            <Button variant="outline" size="sm" onClick={partager}><IconShare taille={15} /> {lienCopie ? 'Lien copié' : 'Partager'}</Button>
+            <Button variant="outline" size="sm" aria-pressed={favori} className={favori ? 'btn--favori' : ''} onClick={() => setFavori(basculerFavori(a.id))}>
+              <IconHeart taille={15} fill={favori ? 'currentColor' : 'none'} /> {favori ? 'Enregistrée' : 'Enregistrer'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setSignaler(true)}><IconFlag taille={15} /> Signaler</Button>
+          </div>
+        </div>
 
         <div className="detail__badges">
-          {loue ? <Badge variant="neutral">Loué</Badge> : <Badge variant="success">{dispo}</Badge>}
-          <Badge variant="warn">Mis à jour {tempsRelatif(a.modifieLe)}</Badge>
+          {loue ? <Badge variant="neutral">Loué</Badge> : <Badge variant="mint"><IconCheckCircle taille={13} /> {dispo}</Badge>}
+          <Badge variant="warn"><IconClock taille={13} /> Mis à jour {tempsRelatif(a.modifieLe)}</Badge>
           <Badge variant="rose">0 commission</Badge>
         </div>
 
         <div className="detail__entete">
-          <div>
-            <h1>{a.titre}</h1>
-            <p className="detail__lieu">
-              {a.repere ? `${a.repere} · ` : ''}
-              {a.quartier}, {a.ville}
-            </p>
-          </div>
-          <div className="detail__actions">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigator.share?.({ title: a.titre, url: window.location.href })}
-            >
-              Partager
-            </Button>
-            {/* TODO : ouvrir SignalerModal (module signalements) */}
-            <button type="button" className="sig__declencheur" onClick={() => setSignaler(true)}>
-              Signaler
-            </button>
-          </div>
+          <h1>{a.titre}</h1>
+          <p className="detail__lieu">
+            <IconPin taille={16} />
+            {a.repere ? `${a.repere} · ` : ''}
+            {a.quartier}, {a.ville}
+          </p>
         </div>
 
         <GalerieAnnonce annonce={a} />
@@ -129,9 +149,9 @@ export default function DetailAnnonce() {
         <div className="detail__grille">
           <div className="detail__principal">
             <ul className="detail__resume">
-              <li>{a.type}</li>
-              <li>{a.meuble ? 'Meublé' : 'Non meublé'}</li>
-              <li>{a.nbPhotos} photos</li>
+              <li><IconBed taille={18} /> {a.type}</li>
+              <li><IconSofa taille={18} /> {a.meuble ? 'Meublé' : 'Non meublé'}</li>
+              {nbPhotos > 0 && <li><IconCamera taille={18} /> {nbPhotos} photos</li>}
             </ul>
 
             <FiabiliteAnnonce annonce={a} />
@@ -143,7 +163,7 @@ export default function DetailAnnonce() {
 
             <section className="detail__section">
               <h2>Le logement</h2>
-              <p>
+              <p className="detail__description">
                 {a.description ||
                   "Description rédigée par le propriétaire : état du logement, pièces, luminosité, voisinage."}
               </p>
@@ -152,33 +172,31 @@ export default function DetailAnnonce() {
             <section className="detail__section">
               <h2>Localisation</h2>
               <div className="detail__localisation">
-                <strong>
-                  {a.quartier}, {a.ville}
-                </strong>
-                {a.repere && <p>Repère : {a.repere}</p>}
-                <small>
-                  L'adresse exacte et l'itinéraire sont donnés par le propriétaire après
-                  déblocage du contact.
-                </small>
+                <span className="detail__localisation-icone"><IconPin taille={20} /></span>
+                <div>
+                  <strong>{a.quartier}, {a.ville}</strong>
+                  {a.repere && <p>Repère : {a.repere}</p>}
+                  <small>
+                    <IconLock taille={12} /> L'adresse exacte et l'itinéraire sont donnés par le propriétaire après déblocage du contact.
+                  </small>
+                </div>
               </div>
             </section>
 
             <section className="detail__section detail__proprio">
-              <div className="detail__avatar" aria-hidden="true">
-                {(a.proprietaire?.nom || 'Propriétaire').slice(0, 1)}
+              <div className="detail__avatar" aria-hidden="true">{initiales}</div>
+              <div className="detail__proprio-texte">
+                <strong>{nomProprio}, propriétaire</strong>
+                <p><IconClock taille={13} /> {a.proprietaire?.horaires || 'Horaires de contact précisés après déblocage'}</p>
               </div>
-              <div>
-                <strong>{a.proprietaire?.nom || 'Propriétaire'}, propriétaire</strong>
-                <p>{a.proprietaire?.horaires || 'Horaires de contact précisés après déblocage'}</p>
-              </div>
-              {a.numeroVerifie && <Badge variant="success">Numéro vérifié</Badge>}
+              {a.numeroVerifie && <Badge variant="mint"><IconShield taille={13} /> Numéro vérifié</Badge>}
             </section>
           </div>
 
           <aside className="detail__prix">
             <div className="detail__prix-carte">
               <p className="detail__loyer">
-                <strong>{formatFCFA(a.loyer)}</strong> / mois
+                <strong>{formatFCFA(a.loyer)}</strong> <span>/ mois</span>
               </p>
 
               <dl className="detail__recap">
@@ -205,15 +223,10 @@ export default function DetailAnnonce() {
               </p>
 
               {loue ? (
-                <Button block disabled>
-                  Logement loué
-                </Button>
+                <Button block disabled>Logement loué</Button>
               ) : (
-                
-                <Button block
-                size="lg"
-                to={passActif ? `/annonces/${a.id}/contact` : `/annonces/${a.id}/debloquer`}>
-                  {passActif ? 'Voir le contact' : 'Débloquer le contact'}
+                <Button block size="lg" to={lienContact}>
+                  <IconKey taille={18} /> {passActif ? 'Voir le contact' : 'Débloquer le contact'}
                 </Button>
               )}
               <p className="detail__pass">
@@ -221,13 +234,15 @@ export default function DetailAnnonce() {
                 jours sur toutes les annonces
               </p>
 
-              <BandeauAntiArnaque />
+              <BandeauAntiArnaque>
+                Aucune caution, avance ou frais avant d'avoir visité et rencontré le propriétaire. ESIKA ne vous demandera jamais d'argent pour un logement.
+              </BandeauAntiArnaque>
             </div>
           </aside>
         </div>
 
         {similaires.length > 0 && (
-          <section className="detail__section">
+          <section className="detail__section detail__section--similaires">
             <h2>Annonces similaires à {a.ville}</h2>
             <div className="detail__similaires">
               {similaires.map((s) => (
@@ -237,12 +252,16 @@ export default function DetailAnnonce() {
           </section>
         )}
       </div>
-      <SignalerModal
-        isOpen={isSignalerOpen}
-        onClose={() => setIsSignalerOpen(false)}
-        annonceId={annonce?.id}
-        annonceTitre={annonce?.titre}
-      />
+
+      {!loue && (
+        <div className="detail__barre-mobile">
+          <div>
+            <strong>{formatFCFA(a.loyer)}</strong>
+            <small>Entrée {formatFCFA(total)}</small>
+          </div>
+          <Button to={lienContact}><IconKey taille={16} /> {passActif ? 'Voir le contact' : 'Débloquer'}</Button>
+        </div>
+      )}
       <SignalerModal annonce={a} ouvert={signaler} onFermer={() => setSignaler(false)} />
     </div>
   );

@@ -1,11 +1,16 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { ROLES } from "../config/constants.js";
+import { ROLES, VILLES } from "../config/constants.js";
+import { lireVille, ecrireVille } from "../lib/ville.js";
 import Button from "./ui/Button.jsx";
+import { IconChevronDown, IconHome, IconPin } from "./ui/Icons.jsx";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [ville, setVille] = useState(lireVille);
 
   // Accepte la valeur de ROLES.ANNONCEUR et "proprietaire" (valeur utilisée par auth.service.js)
   const estProprietaire = !!user && [ROLES.ANNONCEUR, "proprietaire"].includes(user.role);
@@ -13,6 +18,14 @@ export default function Navbar() {
   const deconnecter = () => {
     logout();
     navigate("/", { replace: true });
+  };
+
+  const changerVille = (e) => {
+    const v = e.target.value;
+    setVille(v);
+    ecrireVille(v);
+    // Sur la liste, la ville choisie s'applique tout de suite
+    if (pathname === "/annonces") navigate(`/annonces?ville=${encodeURIComponent(v)}`);
   };
 
   return (
@@ -29,13 +42,22 @@ export default function Navbar() {
         </nav>
 
         <div className="navbar__actions">
+          <label className="ville-select">
+            <span className="sr-only">Ville</span>
+            <IconPin taille={15} className="ville-select__pin" />
+            <select value={ville} onChange={changerVille}>
+              {VILLES.map((v) => <option key={v} value={v}>{v}</option>)}
+            </select>
+            <IconChevronDown taille={14} className="ville-select__fleche" />
+          </label>
+
           {estProprietaire ? (
             <Button to="/annonceur/mes-annonces" variant="outline" size="sm">
-              Mon espace
+              <IconHome taille={16} /> Mon espace
             </Button>
           ) : (
             <Button to={`/connexion?role=${ROLES.ANNONCEUR}`} variant="outline" size="sm">
-              Je suis propriétaire
+              <IconHome taille={16} /> Je suis propriétaire
             </Button>
           )}
 

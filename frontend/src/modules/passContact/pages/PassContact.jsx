@@ -4,9 +4,10 @@ import { getAnnonceById } from '../../annonces/annonces.service';
 import { acheterPass, getPassActif } from '../passContact.service';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
+import { IconCheck, IconCheckCircle, IconInfo, IconKey, IconLock, IconPhone, IconShield } from '../../../components/ui/Icons';
 import Spinner from '../../../components/ui/Spinner';
 import { formatFCFA } from '../../../lib/format';
-import { PASS_PRIX } from '../../../config/constants';
+import { PASS_PRIX, PASS_DUREE_JOURS } from '../../../config/constants';
 import '../passContact.css';
 
 const OPERATEURS = [
@@ -24,9 +25,9 @@ export default function PassContact() {
   const [paiement, setPaiement] = useState(false);
 
   useEffect(() => {
-    // TODO : si non connecté -> /connexion (quand AuthContext + ProtectedRoute existent)
+    // La connexion est exigée par ProtectedRoute (voir routes/index.jsx)
     getPassActif().then((p) => p && navigate(`/annonces/${id}/contact`, { replace: true }));
-    getAnnonceById(id).then(setAnnonce);
+    getAnnonceById(id).then(setAnnonce).catch(() => navigate('/annonces', { replace: true }));
   }, [id, navigate]);
 
   const payer = async (e) => {
@@ -57,9 +58,9 @@ export default function PassContact() {
     <div className="pass">
       <div className="pass__container">
         <ol className="pass__etapes" aria-label="Étapes">
-          <li className="pass__etape--faite">Annonce</li>
-          <li className="pass__etape--active" aria-current="step">Pass Contact</li>
-          <li>Contact du propriétaire</li>
+          <li className="pass__etape--faite"><IconCheckCircle taille={17} /> Annonce</li>
+          <li className="pass__etape--active" aria-current="step"><IconKey taille={17} /> Pass Contact</li>
+          <li><IconPhone taille={17} /> Contact du propriétaire</li>
         </ol>
 
         <div className="pass__grille">
@@ -67,26 +68,28 @@ export default function PassContact() {
             <h1>Débloquez le contact du propriétaire</h1>
 
             <Link to={`/annonces/${annonce.id}`} className="pass__annonce">
-              <div className="pass__vignette" aria-hidden="true" />
+              <div className="pass__vignette" aria-hidden="true">
+                {annonce.photos?.[0] && <img src={annonce.photos[0]} alt="" />}
+              </div>
               <div>
                 <strong>{annonce.titre}</strong>
                 <p>{annonce.repere ? `${annonce.repere}, ` : ''}{annonce.ville}</p>
                 <p>
-                  <strong>{formatFCFA(annonce.loyer)}</strong>/mois · entrée {formatFCFA(total)}
+                  <b>{formatFCFA(annonce.loyer)}</b> /mois · entrée {formatFCFA(total)}
                 </p>
-                {annonce.numeroVerifie && <Badge variant="success">Numéro vérifié</Badge>}
+                {annonce.numeroVerifie && <Badge variant="mint"><IconShield taille={13} /> Numéro vérifié</Badge>}
               </div>
             </Link>
 
             <div className="pass__offre">
               <div className="pass__offre-tete">
-                <span>PASS CONTACT · 7 JOURS</span>
+                <span>PASS CONTACT · {PASS_DUREE_JOURS} JOURS</span>
                 <strong>{formatFCFA(PASS_PRIX)}</strong>
               </div>
               <ul>
-                <li>Contact direct de tous les propriétaires</li>
-                <li>Appel et WhatsApp pendant 7 jours</li>
-                <li>Aucun frais de démarcheur</li>
+                <li><IconCheck taille={16} /> Contact direct de tous les propriétaires</li>
+                <li><IconCheck taille={16} /> Appel et WhatsApp pendant {PASS_DUREE_JOURS} jours</li>
+                <li><IconCheck taille={16} /> Aucun frais de démarcheur</li>
               </ul>
             </div>
           </div>
@@ -105,6 +108,7 @@ export default function PassContact() {
                     checked={operateur === o.id}
                     onChange={() => setOperateur(o.id)}
                   />
+                  <span className="pass__radio" aria-hidden="true" />
                   <span className="pass__sigle">{o.sigle}</span>
                   {o.nom}
                 </label>
@@ -137,11 +141,12 @@ export default function PassContact() {
             </div>
 
             <Button type="submit" block size="lg" disabled={paiement}>
-              {paiement ? 'Paiement en cours…' : `Payer ${formatFCFA(PASS_PRIX)}`}
+              <IconLock taille={17} /> {paiement ? 'Paiement en cours…' : `Payer ${formatFCFA(PASS_PRIX)}`}
             </Button>
 
             <p className="pass__demo">
-              <strong>Version de démonstration :</strong> paiement simulé, aucun débit réel.
+              <IconInfo taille={16} />
+              <span><strong>Version de démonstration :</strong> paiement simulé, aucun débit réel.</span>
             </p>
             <p className="pass__note">
               C'est le seul paiement sur ESIKA. Caution et loyer se règlent au propriétaire, après

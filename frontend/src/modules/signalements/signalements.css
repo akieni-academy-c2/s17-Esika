@@ -21,3 +21,17 @@
 .sig__btn:disabled { opacity: .6; cursor: default; }
 .sig__fin { text-align: center; display: grid; gap: 12px; justify-items: center; }
 .sig__fin p { margin: 0; color: #6b625c; }
+/* ---------- Finitions (charte du site) ---------- */
+.sig__declencheur { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 10px; }
+.sig__fond { animation: auth-in 0.2s ease-out; backdrop-filter: blur(2px); }
+.sig__boite { position: relative; border-radius: 20px; padding: 1.6rem; box-shadow: 0 24px 60px rgba(20, 15, 12, 0.35); animation: pop-modale 0.25s ease-out; }
+@keyframes pop-modale { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+.sig__boite h2 { display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; font-weight: 800; padding-right: 2rem; }
+.sig__fermer { position: absolute; top: 1rem; right: 1rem; display: grid; place-items: center; width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--sand); color: var(--ink-soft); cursor: pointer; }
+.sig__fermer:hover { background: var(--stone); }
+.sig__motifs label { transition: border-color 0.15s ease; }
+.sig__motifs label:hover { border-color: #b9b2a6; }
+.sig__champ { border-color: #d9d2c7; border-radius: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.sig__champ:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 4px rgba(173, 70, 48, 0.14); }
+.sig__btn { min-height: 2.75rem; border-radius: 10px; }
+.sig__fin-icone { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--forest); color: #fff; }
