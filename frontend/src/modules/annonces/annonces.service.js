@@ -35,7 +35,9 @@ function filtrer(annonces, f = {}) {
   return annonces.filter(
     (a) =>
       a.statut === "disponible" &&
-      (!f.ville || a.ville === f.ville) &&
+      // Certaines versions de l'API ne renvoient pas encore city.
+      // Dans ce cas on ne doit pas masquer toutes les annonces.
+      (!f.ville || !a.ville || sansAccent(a.ville) === sansAccent(f.ville)) &&
       (quartiers.length === 0 || quartiers.includes(a.quartier)) &&
       (mots.length === 0 || mots.some((m) => sansAccent(`${a.titre} ${a.quartier} ${a.repere}`).includes(m))) &&
       (!f.loyerMax || a.loyer <= Number(f.loyerMax)) &&
@@ -57,7 +59,30 @@ function trier(annonces, tri = "recentes") {
 }
 
 // Réponse backend -> format front (photos : URLs absolues)
-const normaliser = (a) => ({ ...a, photos: (a.photos ?? []).map(urlPhoto), equipements: a.equipements ?? [] });
+const LIBELLES_EQUIP = { airConditioning: "Climatisation", wifi: "Wi-Fi", generator: "Groupe électrogène", parking: "Parking", furnished: "Meublé", securityGuard: "Gardiennage" };
+const normaliser = (a) => {
+  if (!a) return a;
+  const equipment = a.equipment ?? {};
+  const photos = (a.photos ?? (a.image?.path ? [a.image.path] : [])).map(urlPhoto);
+  return {
+    ...a,
+    id: a.id ?? a.announceId,
+    titre: a.titre ?? `${a.type} · ${a.neighborhood}`,
+    ville: a.ville ?? a.city,
+    quartier: a.quartier ?? a.neighborhood,
+    repere: a.repere ?? a.landmark,
+    loyer: Number(a.loyer ?? a.rent),
+    cautionMois: Number(a.cautionMois ?? a.deposit ?? 0),
+    avanceMois: Number(a.avanceMois ?? a.advance ?? 0),
+    totalEntry: Number(a.totalEntry ?? 0),
+    statut: a.statut ?? (a.status === "rented" ? "loue" : "disponible"),
+    modifieLe: a.modifieLe ?? a.updatedAt ?? a.updated_at ?? new Date().toISOString(),
+    disponibleLe: a.disponibleLe ?? a.availableAt,
+    photos,
+    nbPhotos: Number(a.nbPhotos ?? a.imageCount ?? photos.length),
+    equipements: a.equipements ?? Object.entries(equipment).filter(([, v]) => v).map(([k]) => LIBELLES_EQUIP[k]).filter(Boolean),
+  };
+};
 
 export async function getAnnonces(filtres = {}) {
   if (USE_MOCKS) {
@@ -65,8 +90,9 @@ export async function getAnnonces(filtres = {}) {
         return trier(filtrer(toutesLesAnnonces(), filtres), filtres.tri);
   }
   // Le backend renvoie toutes les annonces disponibles : filtres et tri se font côté front
-  const { data } = await api.get("/announces");
-  return trier(filtrer((data ?? []).map(normaliser), filtres), filtres.tri);
+  const { data } = await api.get("/public/announces");
+  const liste = Array.isArray(data) ? data : (data?.data ?? []);
+  return trier(filtrer(liste.map(normaliser), filtres), filtres.tri);
 }
 
 export async function getAnnonceById(id) {
@@ -76,6 +102,6 @@ export async function getAnnonceById(id) {
     if (!annonce) throw new Error("Annonce introuvable");
     return annonce;
   }
-  const { data } = await api.get(`/announces/${id}`);
+  const { data } = await api.get(`/public/announces/${id}`);
   return normaliser(data);
 }

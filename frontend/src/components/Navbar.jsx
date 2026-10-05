@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { ROLES, VILLES } from "../config/constants.js";
 import { lireVille, ecrireVille } from "../lib/ville.js";
 import Button from "./ui/Button.jsx";
-import { IconChevronDown, IconHome, IconPin } from "./ui/Icons.jsx";
+import { IconChevronDown, IconHome, IconLogout, IconPin } from "./ui/Icons.jsx";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -69,9 +69,9 @@ export default function Navbar() {
                 </span>
                 {user.prenom} {user.nom?.[0]}.
               </span>
-              <button type="button" className="navbar__logout" onClick={deconnecter}>
-                Déconnexion
-              </button>
+              <Button variant="outline" size="sm" onClick={deconnecter}>
+                <IconLogout taille={16} /> Déconnexion
+              </Button>
             </>
           ) : (
             <Button to="/connexion" size="sm">Se connecter</Button>

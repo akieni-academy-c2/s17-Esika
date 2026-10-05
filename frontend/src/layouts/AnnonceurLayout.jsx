@@ -2,7 +2,8 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import PageTransition from "../components/PageTransition.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import Footer from "../components/Footer.jsx";
-import { IconPlus } from "../components/ui/Icons.jsx";
+import Button from "../components/ui/Button.jsx";
+import { IconLogout, IconPlus } from "../components/ui/Icons.jsx";
 import "../modules/annonceur/annonceur.css";
 
 export default function AnnonceurLayout() {
@@ -40,7 +41,7 @@ export default function AnnonceurLayout() {
               <span className="esp__avatar" aria-hidden="true">{initiales}</span>
               <span className="esp__nom">{user?.prenom} {user?.nom?.[0]}.</span>
             </span>
-            <button type="button" className="esp__logout" onClick={deconnecter}>Déconnexion</button>
+            <Button variant="outline" size="sm" onClick={deconnecter}><IconLogout taille={16} /> Déconnexion</Button>
           </div>
         </div>
       </header>

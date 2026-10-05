@@ -34,8 +34,6 @@
 .navbar__actions { display: flex; align-items: center; gap: 0.6rem; }
 .navbar__user { display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px 3px 3px; border: 1px solid var(--line); border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
 .navbar__avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--terracotta); color: #fff; display: grid; place-items: center; font-size: 0.8rem; text-transform: uppercase; }
-.navbar__logout { background: none; border: 0; padding: 4px 6px; font: inherit; font-size: 0.8rem; color: var(--muted); cursor: pointer; text-decoration: underline; }
-.navbar__logout:hover { color: var(--ink); }
 
 /* Sélecteur de ville en pastille */
 .ville-select { position: relative; display: inline-flex; align-items: center; }

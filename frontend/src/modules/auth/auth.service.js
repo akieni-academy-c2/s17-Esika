@@ -114,6 +114,12 @@ export async function seConnecter({ identifiant, motDePasse, role }) {
     );
   }
 
+  if (identifiant === ADMIN_MOCK) {
+    const { data } = await apiClient.post('/admin/signin', { phoneNumber: telephone(identifiant), password: motDePasse });
+    const u = data.user ?? {};
+    return ouvrirSession({ id: u.id ?? 'admin', prenom: u.firstName ?? 'Admin', nom: initiale(u.lastName ?? 'ESIKA'), identifiant, role: 'admin', numeroVerifie: true }, data.token);
+  }
+
   // Le backend a une route de connexion par rôle : locataire d'abord, puis propriétaire si le numéro est inconnu
   const ordre = role === 'proprietaire' ? ['announcer', 'tenant'] : ['tenant', 'announcer'];
   let derniereErreur;
