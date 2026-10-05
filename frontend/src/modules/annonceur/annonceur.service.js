@@ -55,11 +55,30 @@ export async function publierAnnonce(data, photos, user) {
   }
 
   const form = new FormData();
-  form.append("announce", JSON.stringify(annonce)); // le backend attend le champ « announce »
-  photos.forEach((p, i) => form.append("photos", p.blob, `photo-${i + 1}.webp`));
-  const { data: cree } = await apiClient.post("/announcer/announces", form);
+  form.append("type", data.type);
+  form.append("rent", String(loyer));
+  form.append("city", data.ville);
+  form.append("neighborhood", data.quartier);
+  form.append("deposit", String(Number(data.cautionMois) || 0));
+  form.append("advance", String(Number(data.avanceMois) || 0));
+  form.append("landmark", data.repere || "");
+  form.append("description", data.description || "");
+  form.append("waterElectricity", data.electriciteEau || "");
+  form.append("availableAt", data.disponibleLe || "");
+  form.append("favorTime", data.horaires || "");
+  form.append("sanitary", data.sanitary || "À préciser");
+  form.append("kitchen", data.kitchen || "À préciser");
+  const equipements = data.equipements ?? [];
+  form.append("airConditioning", String(equipements.includes("Climatisation")));
+  form.append("wifi", String(equipements.includes("Wi-Fi")));
+  form.append("generator", String(equipements.includes("Groupe électrogène")));
+  form.append("parking", String(equipements.includes("Parking")));
+  form.append("furnished", String(Boolean(data.meuble)));
+  form.append("securityGuard", String(equipements.includes("Gardiennage")));
+  photos.forEach((p, i) => form.append("images", p.blob, `photo-${i + 1}.webp`));
+  const { data: cree } = await apiClient.post("/announcer/announce", form);
   effacerBrouillon();
-  return { ...annonce, id: cree?.id ?? annonce.id };
+  return { ...annonce, id: cree?.id ?? cree?.announce_id ?? annonce.id };
 }
 // ---------- Mes annonces ----------
 const ecrireLocales = (liste) => localStorage.setItem(CLE_ANNONCES, JSON.stringify(liste));
@@ -78,7 +97,20 @@ export async function getMesAnnonces() {
     return lireMesAnnoncesLocales();
   }
   const { data } = await apiClient.get("/announcer/announces");
-  return (data ?? []).map((a) => ({ ...a, photos: (a.photos ?? []).map(urlPhoto) }));
+  const liste = Array.isArray(data) ? data : (data?.data ?? []);
+  return liste.map((a) => ({
+    ...a,
+    id: a.id ?? a.announceId,
+    titre: a.titre ?? `${a.type} · ${a.neighborhood}`,
+    ville: a.ville ?? a.city,
+    quartier: a.quartier ?? a.neighborhood,
+    loyer: Number(a.loyer ?? a.rent),
+    cautionMois: Number(a.cautionMois ?? a.deposit ?? 0),
+    avanceMois: Number(a.avanceMois ?? a.advance ?? 0),
+    statut: a.statut ?? (a.status === "rented" ? "loue" : a.paused ? "pause" : "disponible"),
+    modifieLe: a.modifieLe ?? a.updatedAt ?? new Date().toISOString(),
+    photos: (a.photos ?? (a.image?.path ? [a.image.path] : [])).map(urlPhoto),
+  }));
 }
 
 export async function modifierPrix(id, loyer) {
