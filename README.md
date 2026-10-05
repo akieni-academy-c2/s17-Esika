@@ -170,8 +170,8 @@ Objectifs : mobile-first, chargement < 3 s en 3G, images en WebP < 200 Ko, pages
 | Cédric Hubert NGOUBY| Product Manager |
 | Robert Phillipe Najibe IBOVI IKAMA| Business Analyst |
 | Grâce Chatel NDOUOLO| Business Analyst |
-| José Gloire BOKITOMO| Développeur Fullstack(front-end) |
-| Virgile Yann PEMBET-ALECK| Développeur (back-end) |
+| José Gloire BOKITOMO| Développeur Fullstack (front-end) |
+| Virgile Yann PEMBET-ALECK| Développeur Fullstack (back-end) |
 
 ## Limites connues et suite
 
