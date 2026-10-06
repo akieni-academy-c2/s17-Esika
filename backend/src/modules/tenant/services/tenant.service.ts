@@ -42,7 +42,7 @@ const loginTenant = async ({ phoneNumber, password }: LoginData): Promise<string
 
 	const token = jwt.sign(
 		{
-			userId: tenant.announcer_id,
+			userId: tenant.tenant_id,
 			role: "tenant",
 		},
 		process.env.JWT_SECRET_KEY!,

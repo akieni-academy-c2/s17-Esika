@@ -70,7 +70,7 @@ const signInTenant = async (req: Request, res: Response) => {
 		throw new AppError(400, "Le numéro de téléphone et le mot de passe sont obligatoires");
 	}
 
-		// Validation du numéro de téléphone
+	// Validation du numéro de téléphone
 	const regexNumber = /^\+?\d{5,15}$/;
 	if (!regexNumber.test(data.phoneNumber)) {
 		throw new AppError(400, "Format numéro de téléphone invalide");
