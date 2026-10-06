@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import AppError from "../../../utils/app-error.ts";
-import { getReports } from "../services/admin-report.service.ts";
+import { getReports, changeReportStatus } from "../services/admin-report.service.ts";
+import { REPORT_STATUSES } from "../constant.ts";
 
 const getReportsController = async (req: Request, res: Response) => {
 	const page = req.query.page ? Number(req.query.page) : 1;
@@ -23,4 +24,24 @@ const getReportsController = async (req: Request, res: Response) => {
 	});
 };
 
-export { getReportsController };
+const updateReportStatusController = async (req: Request, res: Response) => {
+	const reportId = Number(req.params.id);
+	const { status } = req.body;
+
+	if (!Number.isInteger(reportId) || reportId < 1) {
+		throw new AppError(400, "L'identifiant du signalement est invalide");
+	}
+
+	if (!REPORT_STATUSES.includes(status)) {
+		throw new AppError(400, "Le statut est invalide");
+	}
+
+	await changeReportStatus({ reportId, status });
+
+	res.status(200).json({
+		message: "Statut du signalement mis à jour avec succès",
+		status: 200,
+	});
+};
+
+export { getReportsController, updateReportStatusController };

@@ -28,4 +28,12 @@ const countReports = `
     INNER JOIN announces a ON a.announce_id = r.announce_id;
 `;
 
-export { selectReports, countReports };
+const updateReportStatus = `
+    UPDATE reports
+    SET status = $2::report_status,
+        updated_at = NOW(),
+        handled_at = CASE WHEN $2::report_status = 'processed' THEN NOW() ELSE handled_at END
+    WHERE id = $1;
+`;
+
+export { selectReports, countReports, updateReportStatus };

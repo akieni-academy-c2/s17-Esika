@@ -26,4 +26,9 @@ type ReportsPage = {
 	};
 };
 
-export type { ReportStatus, GetReports, ReportItem, ReportsPage };
+type UpdateReportStatus = {
+	reportId: number;
+	status: ReportStatus;
+};
+
+export type { ReportStatus, GetReports, ReportItem, ReportsPage, UpdateReportStatus };
