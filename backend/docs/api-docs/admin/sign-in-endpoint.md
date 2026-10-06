@@ -5,7 +5,7 @@
 Permet à un annonceur inscrit de se connecter.
 
 - **Méthode HTTP :** `POST`
-- **Route :** `/api/tenant/signin`
+- **Route :** `/api/admin/signin`
 - **Content-Type :** `application/json`
 
 ## Body attendu

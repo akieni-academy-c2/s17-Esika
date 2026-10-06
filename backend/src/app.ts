@@ -6,6 +6,7 @@ import errorHandler from "./middleware/error-handler.middleware.ts";
 import { announcerRoutes } from "./modules/announcer/index.ts";
 import { tenantRoutes } from "./modules/tenant/index.ts";
 import { publicRoutes } from "./modules/public/index.ts";
+import { adminRoutes } from "./modules/admin/index.ts";
 
 const app: Express = express();
 
@@ -19,6 +20,7 @@ app.use(logger);
 app.use("/api/announcer", announcerRoutes);
 app.use("/api/tenant", tenantRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(notFound);
 
