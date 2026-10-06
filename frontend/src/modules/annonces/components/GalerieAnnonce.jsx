@@ -7,7 +7,10 @@ export default function GalerieAnnonce({ annonce }) {
   // Quand l'annonce a de vraies photos (URLs), elles remplacent les blocs gris.
   const photos = annonce.photos ?? [];
   const total = annonce.nbPhotos ?? photos.length;
-  const tuiles = LIBELLES.map((libelle, i) => ({ libelle, src: photos[i] }));
+  // Avec de vraies photos : une tuile par photo (5 maximum) ; sinon des emplacements nommés
+  const tuiles = photos.length
+    ? photos.slice(0, 5).map((src, i) => ({ libelle: `Photo ${i + 1}`, src }))
+    : LIBELLES.map((libelle) => ({ libelle, src: undefined }));
   const [ouverte, setOuverte] = useState(null); // index de la photo affichée en grand, ou null
 
   const nb = Math.max(total, photos.length, 1);
@@ -40,7 +43,7 @@ export default function GalerieAnnonce({ annonce }) {
             aria-label={`Agrandir : ${t.libelle}`}
           >
             {t.src ? (
-              <img src={t.src} alt={`${t.libelle} — ${annonce.titre}`} loading={i === 0 ? 'eager' : 'lazy'} />
+              <img src={t.src} alt={`Photo ${i + 1} du logement — ${annonce.titre}`} loading={i === 0 ? 'eager' : 'lazy'} />
             ) : (
               <span className="galerie__vide"><IconCamera taille={16} /> {t.libelle}</span>
             )}
