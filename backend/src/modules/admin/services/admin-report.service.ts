@@ -28,8 +28,6 @@ const getReports = async ({ page, limit }: GetReports): Promise<ReportsPage> => 
 	return {
 		reports,
 		pagination: {
-			page,
-			limit,
 			total,
 			totalPages: Math.ceil(total / limit),
 		},
