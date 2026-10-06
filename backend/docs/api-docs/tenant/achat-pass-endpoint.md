@@ -7,7 +7,7 @@ Permet à un utilisateur authentifié d'acheter un pass pour une annonce.
 Un pass est valable **7 jours** à partir de sa création.
 
 - **Méthode HTTP :** `POST`
-- **Route :** `/api/announces/:id/passes`
+- **Route :** `/api/tenant/announces/:id/passes`
 - **Content-Type :** `application/json`
 - **Authentification :** Bearer Token
 
@@ -48,33 +48,11 @@ Les champs suivants ne sont **pas** envoyés par le client :
 - `created_at` : date de création, définie par le serveur.
 - `expired_at` : date d'expiration, définie par le serveur à `created_at + 7 jours`.
 
-## Validation
-
-Le numéro de téléphone est obligatoire.
-
-Le numéro de téléphone doit respecter le format suivant :
-
-- un `+` facultatif au début ;
-- uniquement des chiffres ensuite ;
-- entre 5 et 15 chiffres ;
-- aucun espace, tiret ou point.
-
-```text
-"+242061234567"   → valide
-"061234567"       → valide
-"06 123 45 67"    → invalide (espaces)
-"+242-06-123-456" → invalide (tirets)
-```
-
-L'identifiant de l'annonce doit être un entier supérieur ou égal à `1`.
-
-> Le numéro de téléphone est validé **avant** l'identifiant de l'annonce. Si les deux sont invalides, seule l'erreur sur le numéro de téléphone est retournée.
-
 ## Exemple de requête
 
 ```ts
 const buyPass = async (announceId: number, phoneNumber: string, token: string) => {
-  const response = await fetch(`/api/announces/${announceId}/passes`, {
+  const response = await fetch(`/api/tenant/announces/${announceId}/passes`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

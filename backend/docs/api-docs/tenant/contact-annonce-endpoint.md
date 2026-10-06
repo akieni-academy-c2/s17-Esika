@@ -5,7 +5,7 @@
 Permet à un utilisateur authentifié de récupérer les informations résumées d'une annonce, ainsi que le montant total à prévoir pour l'entrée dans le logement.
 
 - **Méthode HTTP :** `GET`
-- **Route :** `/api/announces/:id/contact`
+- **Route :** `/api/tenant/announces/:id/contact`
 - **Authentification :** Bearer Token
 
 ## Authentification
