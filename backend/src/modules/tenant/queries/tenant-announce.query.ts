@@ -5,6 +5,8 @@ const selectAnnounceContact = `
         a.city,
         a.neighborhood,
         a.landmark,
+        a.deposit,
+        a.advance,
 
         (
             SELECT json_build_object(
@@ -15,7 +17,7 @@ const selectAnnounceContact = `
             WHERE i.announce_id = a.announce_id
             ORDER BY i.image_id
             LIMIT 1
-        ) AS image,
+        ) AS image
 
     FROM announces a
 
