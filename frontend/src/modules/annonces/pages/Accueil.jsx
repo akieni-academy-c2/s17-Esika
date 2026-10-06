@@ -5,8 +5,10 @@ import Spinner from "../../../components/ui/Spinner.jsx";
 import AnnonceCard from "../../../components/AnnonceCard.jsx";
 import BandeauAntiArnaque from "../../../components/BandeauAntiArnaque.jsx";
 import Badge from "../../../components/ui/Badge.jsx";
+import Diaporama from "../../../components/Diaporama.jsx";
+import { HERO_IMAGES, HERO_INTERVALLE_MS, IMG } from "../../../config/images.js";
 import {
-  IconBolt, IconChevron, IconGlobe, IconCar, IconSearch, IconShield, IconSnow, IconSofa, IconTag, IconReceipt, IconChevronDown, IconPin,
+  IconBolt, IconCheck, IconChevron, IconGlobe, IconCar, IconSearch, IconShield, IconSnow, IconSofa, IconTag, IconReceipt, IconChevronDown, IconPin,
 } from "../../../components/ui/Icons.jsx";
 import { PASS_PRIX, PASS_DUREE_JOURS, TYPES_LOGEMENT, VILLES } from "../../../config/constants.js";
 import { formatFCFA, calculerTotalEntree } from "../../../lib/format.js";
@@ -81,20 +83,10 @@ export default function Accueil() {
             </ul>
           </div>
 
-          <div className="hero__visuel" aria-hidden={vedette ? undefined : "true"}>
-            <svg className="hero__dessin" viewBox="0 0 400 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-              <rect width="400" height="340" fill="#e4ded4" />
-              <rect y="230" width="400" height="110" fill="#d6cec1" />
-              <rect x="60" y="40" width="130" height="170" rx="6" fill="#f3efe8" />
-              <rect x="72" y="52" width="106" height="146" rx="3" fill="#cfd9d4" />
-              <path d="M125 52v146M72 125h106" stroke="#f3efe8" strokeWidth="5" />
-              <rect x="222" y="70" width="110" height="140" rx="6" fill="#f3efe8" />
-              <rect x="234" y="82" width="86" height="116" rx="3" fill="#ead8d1" />
-              <path d="M277 82v116" stroke="#f3efe8" strokeWidth="5" />
-              <rect x="70" y="236" width="170" height="54" rx="14" fill="#ad4630" opacity="0.88" />
-              <rect x="82" y="214" width="146" height="40" rx="12" fill="#bd5a43" opacity="0.88" />
-              <rect x="262" y="262" width="70" height="40" rx="4" fill="#bdb4a4" />
-            </svg>
+          <div className="hero__visuel">
+            <div className="hero__diapo">
+              <Diaporama images={HERO_IMAGES} intervalle={HERO_INTERVALLE_MS} label="Photos de logements à Brazzaville et Pointe-Noire" />
+            </div>
             {vedette && (
               <Link to={`/annonces/${vedette.id}`} className="hero__carte">
                 <span className="hero__carte-tete">
@@ -182,32 +174,81 @@ export default function Accueil() {
       </section>
 
       <section className="section">
-        <div className="container steps">
-          <div className="step">
-            <span className="step__num">1</span>
-            <h3>Cherchez gratuitement</h3>
-            <p>Prix, total d'entrée, équipements et fiabilité : tout est visible avant la visite.</p>
+        <div className="container">
+          <div className="section__tete">
+            <div>
+              <h2>Comment ça marche</h2>
+              <p className="muted">Trois étapes, sans intermédiaire</p>
+            </div>
+            <Link to="/comment-ca-marche" className="lien-fleche">En savoir plus <IconChevron taille={16} /></Link>
           </div>
-          <div className="step">
-            <span className="step__num">2</span>
-            <h3>Débloquez le contact</h3>
-            <p>Pass Contact à {formatFCFA(PASS_PRIX)}, valable {PASS_DUREE_JOURS} jours sur toutes les annonces.</p>
-          </div>
-          <div className="step">
-            <span className="step__num">3</span>
-            <h3>Visitez, puis payez</h3>
-            <p>Appel ou WhatsApp direct. La caution se règle au propriétaire, après la visite.</p>
-          </div>
-          <div className="step step--proprio">
-            <p className="step__label">Propriétaires</p>
-            <h3>Publiez gratuitement, en 5 minutes.</h3>
-            <Button to={lienPublier} variant="light">Publier une annonce</Button>
+          <div className="etapes">
+            {[
+              ["Cherchez gratuitement", "Prix, total d'entrée, équipements et fiabilité : tout est visible avant la visite."],
+              ["Débloquez le contact", `Pass Contact à ${formatFCFA(PASS_PRIX)}, valable ${PASS_DUREE_JOURS} jours sur toutes les annonces.`],
+              ["Visitez, puis payez", "Appel ou WhatsApp direct. La caution se règle au propriétaire, après la visite."],
+            ].map(([titre, texte], i) => (
+              <article key={titre} className="etape">
+                <img src={IMG.etapes[i].src} alt={IMG.etapes[i].alt} width="720" height="720" loading="lazy" decoding="async" />
+                <div className="etape__corps">
+                  <span className="etape__num">{i + 1}</span>
+                  <h3>{titre}</h3>
+                  <p>{texte}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="section">
+        <div className="container confiance">
+          <img className="confiance__img" src={IMG.confiance.src} alt={IMG.confiance.alt} width={IMG.confiance.largeur} height={IMG.confiance.hauteur} loading="lazy" decoding="async" />
+          <div className="confiance__texte">
+            <p className="hero__eyebrow">Pourquoi ESIKA</p>
+            <h2>Zéro démarcheur, information vérifiée.</h2>
+            <p className="muted">Vous voyez le vrai prix et le montant à réunir avant de vous déplacer, et vous parlez directement au propriétaire.</p>
+            <ul className="confiance__liste">
+              <li><IconCheck taille={16} /> Prix réel et total à l'entrée affichés sur chaque annonce</li>
+              <li><IconCheck taille={16} /> Numéros de téléphone vérifiés</li>
+              <li><IconCheck taille={16} /> Annonces mises à jour chaque semaine par les propriétaires</li>
+              <li><IconCheck taille={16} /> Un signalement en un clic, traité par l'équipe ESIKA</li>
+            </ul>
+            <Button to="/annonces" variant="outline">Voir les annonces</Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container proprio-section">
+          <div className="proprio-section__texte">
+            <p className="step__label">Propriétaires</p>
+            <h2>Publiez gratuitement, en 5 minutes.</h2>
+            <p>Des locataires qui vous appellent directement, sans démarcheur. Un conseiller ESIKA peut même publier l'annonce avec vous sur WhatsApp.</p>
+            <Button to={lienPublier} variant="light" size="lg">Publier une annonce</Button>
+          </div>
+          <img className="proprio-section__img" src={IMG.proprietaire.src} alt={IMG.proprietaire.alt} width={IMG.proprietaire.largeur} height={IMG.proprietaire.hauteur} loading="lazy" decoding="async" />
+        </div>
+      </section>
+
+      <section className="section">
         <div className="container"><BandeauAntiArnaque /></div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className="bandeau-final">
+            <img src={IMG.bandeau.src} alt="" width={IMG.bandeau.largeur} height={IMG.bandeau.hauteur} loading="lazy" decoding="async" />
+            <div className="bandeau-final__contenu">
+              <h2>Prêt à trouver votre prochain logement ?</h2>
+              <p>Parcourez les annonces des propriétaires, ou publiez la vôtre gratuitement.</p>
+              <div className="bandeau-final__actions">
+                <Button to="/annonces" size="lg">Rechercher un logement</Button>
+                <Button to={lienPublier} variant="light" size="lg">Publier une annonce</Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </>
   );

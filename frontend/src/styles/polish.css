@@ -97,15 +97,6 @@ a, .auth__lien, .adm__lien, .adm__logout { transition: color 0.15s ease; }
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* ---------- Mobile : le menu reste accessible ---------- */
-@media (max-width: 720px) {
-  .navbar__inner { flex-wrap: wrap; gap: 0 0.75rem; padding-block: 0.5rem; }
-  .navbar__actions { flex-wrap: wrap; justify-content: flex-end; }
-  .navbar__actions .btn--outline { display: inline-flex; }
-  .navbar__links { display: flex; order: 3; width: 100%; gap: 1.25rem; margin: 0; overflow-x: auto; }
-  .navbar__links a { padding-block: 0.5rem; white-space: nowrap; }
-}
-
 /* ---------- Page d'erreur ---------- */
 .erreur-page { max-width: 34rem; margin: 12vh auto 0; padding: 0 1.25rem; text-align: center; }
 .erreur-page h1 { font-size: 1.6rem; margin-bottom: 0.6rem; }
