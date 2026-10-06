@@ -24,7 +24,7 @@ const loginAdmin = async ({
 	const token = jwt.sign(
 		{
 			userId: admin.admin_id,
-			role: "announcer",
+			role: "admin",
 		},
 		process.env.JWT_SECRET_KEY!,
 		{
