@@ -1,4 +1,4 @@
-import apiClient, { USE_MOCKS } from '../../lib/apiClient';
+import apiClient, { USE_MOCKS, USE_ADMIN_MOCKS } from '../../lib/apiClient';
 
 // Authentification par téléphone + mot de passe (backend de Virgile : /tenant et /announcer, signup + signin).
 // L'étape « code SMS » de l'inscription est SIMULÉE côté front (aucun SMS réel n'est envoyé).
@@ -6,7 +6,8 @@ import apiClient, { USE_MOCKS } from '../../lib/apiClient';
 export const ID_MODE = 'phone';
 export const CODE_LONGUEUR = 6;
 export const CODE_MOCK = '123456';
-export const ADMIN_MOCK = '060000000'; // démo : 06 000 0000 ouvre le back-office (données admin simulées)
+export const ADMIN_MOCK = '060000000'; // compte de démonstration réservé au développement
+export const ADMIN_MOCK_PASSWORD = import.meta.env.VITE_ADMIN_MOCK_PASSWORD || 'esika-admin-demo';
 export const AUTH_REELLE = import.meta.env.VITE_REAL_AUTH === 'true' || !USE_MOCKS;
 
 const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -95,29 +96,40 @@ export async function verifierCode({ identifiant, code }) {
 
 /** Connexion par téléphone + mot de passe. Retourne { user, token } */
 export async function seConnecter({ identifiant, motDePasse, role }) {
-  if (!AUTH_REELLE) {
-    await attendre(500);
-    // Démo : le back-office admin est simulé, on l'ouvre avec le numéro 06 000 0000
-    const estAdmin = identifiant === ADMIN_MOCK;
-    const compte = lireComptes()[identifiant];
-    if (!estAdmin && !compte) throw new Error('COMPTE_INCONNU');
+  // Le compte admin de démonstration est complètement indépendant des mocks généraux.
+  // Il est impossible à activer en production grâce à USE_ADMIN_MOCKS (DEV uniquement).
+  if (USE_ADMIN_MOCKS && identifiant === ADMIN_MOCK) {
+    await attendre(250);
+    if (motDePasse !== ADMIN_MOCK_PASSWORD) throw new Error('IDENTIFIANTS_ADMIN_MOCK_INVALIDES');
     return ouvrirSession(
-      {
-        id: 'u-' + identifiant,
-        prenom: estAdmin ? 'Admin' : compte.prenom,
-        nom: estAdmin ? 'ESIKA' : initiale(compte.nom),
-        identifiant,
-        role: estAdmin ? 'admin' : compte.role,
-        numeroVerifie: true,
-      },
-      'mock-token',
+      { id: 'admin-mock', prenom: 'Admin', nom: 'ESIKA', identifiant, role: 'admin', numeroVerifie: true },
+      'admin-mock-token',
     );
   }
 
+  // Le compte admin réel reste toujours branché sur le backend, même si VITE_USE_MOCKS=true.
+  // Ainsi, activer des mocks généraux ne désactive jamais l’accès admin réel.
   if (identifiant === ADMIN_MOCK) {
     const { data } = await apiClient.post('/admin/signin', { phoneNumber: telephone(identifiant), password: motDePasse });
     const u = data.user ?? {};
     return ouvrirSession({ id: u.id ?? 'admin', prenom: u.firstName ?? 'Admin', nom: initiale(u.lastName ?? 'ESIKA'), identifiant, role: 'admin', numeroVerifie: true }, data.token);
+  }
+
+  if (!AUTH_REELLE) {
+    await attendre(500);
+    const compte = lireComptes()[identifiant];
+    if (!compte) throw new Error('COMPTE_INCONNU');
+    return ouvrirSession(
+      {
+        id: 'u-' + identifiant,
+        prenom: compte.prenom,
+        nom: initiale(compte.nom),
+        identifiant,
+        role: compte.role,
+        numeroVerifie: true,
+      },
+      'mock-token',
+    );
   }
 
   // Le backend a une route de connexion par rôle : locataire d'abord, puis propriétaire si le numéro est inconnu

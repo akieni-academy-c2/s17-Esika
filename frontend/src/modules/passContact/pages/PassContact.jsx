@@ -26,7 +26,7 @@ export default function PassContact() {
 
   useEffect(() => {
     // La connexion est exigée par ProtectedRoute (voir routes/index.jsx)
-    getPassActif().then((p) => p && navigate(`/annonces/${id}/contact`, { replace: true }));
+    getPassActif(id).then((p) => p && navigate(`/annonces/${id}/contact`, { replace: true }));
     getAnnonceById(id).then(setAnnonce).catch(() => navigate('/annonces', { replace: true }));
   }, [id, navigate]);
 
@@ -40,7 +40,7 @@ export default function PassContact() {
     setErreur('');
     setPaiement(true);
     try {
-      await acheterPass({ operateur, numero: propre });
+      await acheterPass({ annonceId: id, operateur, numero: propre });
       navigate(`/annonces/${id}/contact`, { replace: true });
     } catch {
       setErreur('Le paiement a échoué. Vérifiez votre solde et réessayez.');

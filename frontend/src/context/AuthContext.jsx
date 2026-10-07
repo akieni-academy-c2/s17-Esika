@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
@@ -12,6 +12,12 @@ function lireUtilisateur() {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(lireUtilisateur);
+
+  useEffect(() => {
+    const onLogout = () => setUser(null);
+    window.addEventListener("esika:logout", onLogout);
+    return () => window.removeEventListener("esika:logout", onLogout);
+  }, []);
 
   const login = (utilisateur, token) => {
     localStorage.setItem("esika_user", JSON.stringify(utilisateur));

@@ -23,7 +23,7 @@ export default function ContactDebloque() {
   useEffect(() => {
     let annule = false;
     (async () => {
-      const p = await getPassActif();
+      const p = await getPassActif(id);
       if (!p) return navigate(`/annonces/${id}/debloquer`, { replace: true });
       const a = await getAnnonceById(id);
       if (!a) return navigate('/annonces', { replace: true });
