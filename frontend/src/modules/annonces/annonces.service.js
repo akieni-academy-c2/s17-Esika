@@ -39,7 +39,7 @@ function filtrer(annonces, f = {}) {
       // Dans ce cas on ne doit pas masquer toutes les annonces.
       (!f.ville || !a.ville || sansAccent(a.ville) === sansAccent(f.ville)) &&
       (quartiers.length === 0 || quartiers.includes(a.quartier)) &&
-      (mots.length === 0 || mots.some((m) => sansAccent(`${a.titre} ${a.quartier} ${a.repere}`).includes(m))) &&
+      (mots.length === 0 || mots.every((m) => sansAccent(`${a.titre} ${a.quartier} ${a.repere}`).includes(m))) &&
       (!f.loyerMax || a.loyer <= Number(f.loyerMax)) &&
       (!f.budgetMax || calculerTotalEntree(a.loyer, a.cautionMois, a.avanceMois) <= Number(f.budgetMax)) &&
       (!f.type || a.type === f.type) &&
@@ -63,7 +63,14 @@ const LIBELLES_EQUIP = { airConditioning: "Climatisation", wifi: "Wi-Fi", genera
 const normaliser = (a) => {
   if (!a) return a;
   const equipment = a.equipment ?? {};
-  const photos = (a.photos ?? (a.image?.path ? [a.image.path] : [])).map(urlPhoto);
+  // Le endpoint de liste renvoie `image` (une seule couverture),
+  // tandis que le endpoint de détail renvoie `images` (tableau d'objets { path, label }).
+  // On normalise les trois formats pour que la galerie reçoive toujours des URLs.
+  const rawPhotos = a.photos ?? a.images ?? (a.image?.path ? [a.image] : []);
+  const photos = (Array.isArray(rawPhotos) ? rawPhotos : [rawPhotos])
+    .map((photo) => typeof photo === "string" ? photo : photo?.path)
+    .filter(Boolean)
+    .map(urlPhoto);
   return {
     ...a,
     id: a.id ?? a.announceId,
@@ -75,12 +82,15 @@ const normaliser = (a) => {
     cautionMois: Number(a.cautionMois ?? a.deposit ?? 0),
     avanceMois: Number(a.avanceMois ?? a.advance ?? 0),
     totalEntry: Number(a.totalEntry ?? 0),
-    statut: a.statut ?? (a.status === "rented" ? "loue" : "disponible"),
+    statut: a.statut ?? (a.status === "rented" ? "loue" : a.status === "paused" || a.status === "hidden" ? "pause" : "disponible"),
     modifieLe: a.modifieLe ?? a.updatedAt ?? a.updated_at ?? new Date().toISOString(),
     disponibleLe: a.disponibleLe ?? a.availableAt,
     photos,
     nbPhotos: Number(a.nbPhotos ?? a.imageCount ?? photos.length),
     equipements: a.equipements ?? Object.entries(equipment).filter(([, v]) => v).map(([k]) => LIBELLES_EQUIP[k]).filter(Boolean),
+    meuble: a.meuble ?? Boolean(equipment.furnished),
+    proprietaire: a.proprietaire ?? (a.firstName || a.lastName ? { nom: `${a.firstName ?? ""} ${a.lastName ?? ""}`.trim() } : undefined),
+    numeroVerifie: a.numeroVerifie ?? true,
   };
 };
 
@@ -90,8 +100,22 @@ export async function getAnnonces(filtres = {}) {
         return trier(filtrer(toutesLesAnnonces(), filtres), filtres.tri);
   }
   // Le backend renvoie toutes les annonces disponibles : filtres et tri se font côté front
-  const { data } = await api.get("/public/announces");
-  const liste = Array.isArray(data) ? data : (data?.data ?? []);
+  const first = await api.get("/public/announces", { params: { page: 1, limit: 100 } });
+  const firstData = first.data;
+  const firstList = Array.isArray(firstData) ? firstData : (firstData?.data ?? []);
+  const totalPages = Number(firstData?.pagination?.totalPages ?? 1);
+  let liste = [...firstList];
+  if (totalPages > 1) {
+    const pages = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        api.get("/public/announces", { params: { page: i + 2, limit: 100 } })
+      )
+    );
+    for (const response of pages) {
+      const payload = response.data;
+      liste.push(...(Array.isArray(payload) ? payload : (payload?.data ?? [])));
+    }
+  }
   return trier(filtrer(liste.map(normaliser), filtres), filtres.tri);
 }
 

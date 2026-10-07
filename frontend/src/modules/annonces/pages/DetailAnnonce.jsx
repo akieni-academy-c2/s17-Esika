@@ -54,7 +54,7 @@ export default function DetailAnnonce() {
       .catch(() => !annule && setEtat('introuvable'));
 
     // Le pass actif décide du bouton affiché (Débloquer / Voir le contact)
-    getPassActif()
+    getPassActif(id)
       .then((p) => !annule && setPassActif(!!p))
       .catch(() => {});
 

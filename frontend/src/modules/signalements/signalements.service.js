@@ -44,7 +44,7 @@ export async function signalerAnnonce({ annonce, motif, message, user }) {
     return s;
   }
   try {
-    const { data } = await api.post(`/announces/${annonce.id}/reports`, { motif, message: message.trim() });
+    const { data } = await api.post(`/tenant/announces/${annonce.id}/reports`, { reason: motif, description: message.trim() });
     return data;
   } catch (err) {
     if (err.response?.status === 409) throw new Error("DEJA_SIGNALE", { cause: err });

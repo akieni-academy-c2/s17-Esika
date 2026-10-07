@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 import PasswordField from '../components/PasswordField';
-import { messageErreur, seConnecter } from '../auth.service';
+import { ADMIN_MOCK, ADMIN_MOCK_PASSWORD, messageErreur, seConnecter } from '../auth.service';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function Connexion() {
@@ -67,6 +67,10 @@ export default function Connexion() {
       />
 
       <p className="auth__erreur" role="alert">{erreur}</p>
+
+      {import.meta.env.DEV && import.meta.env.VITE_USE_ADMIN_MOCKS === 'true' && (
+        <p className="auth__demo">Admin démo : {ADMIN_MOCK} / {ADMIN_MOCK_PASSWORD}</p>
+      )}
 
       <Button type="submit" block size="lg" disabled={charge}>
         {charge ? 'Connexion…' : 'Se connecter'}

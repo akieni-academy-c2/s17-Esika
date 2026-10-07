@@ -11,9 +11,7 @@ export const lireBrouillon = () => {
 export const sauverBrouillon = (data) => localStorage.setItem(CLE_BROUILLON, JSON.stringify(data));
 export const effacerBrouillon = () => localStorage.removeItem(CLE_BROUILLON);
 
-export function lireMesAnnoncesLocales() {
-  try { return JSON.parse(localStorage.getItem(CLE_ANNONCES)) ?? []; } catch { return []; }
-}
+export function lireMesAnnoncesLocales() { try { return JSON.parse(localStorage.getItem(CLE_ANNONCES)) ?? []; } catch { return []; } }
 
 /** Publie une annonce. photos : [{ blob, url, taille }] */
 export async function publierAnnonce(data, photos, user) {
@@ -65,9 +63,12 @@ export async function publierAnnonce(data, photos, user) {
   form.append("description", data.description || "");
   form.append("waterElectricity", data.electriciteEau || "");
   form.append("availableAt", data.disponibleLe || "");
-  form.append("favorTime", data.horaires || "");
-  form.append("sanitary", data.sanitary || "À préciser");
-  form.append("kitchen", data.kitchen || "À préciser");
+  form.append("favorTime", String(data.horaires || "À préciser"));
+  // Le formulaire actuel ne demande pas encore ces deux détails : le backend accepte
+  // leur absence et applique la valeur « À préciser ». On les envoie aussi explicitement
+  // pour garder un contrat multipart stable.
+  form.append("sanitary", String(data.sanitary || "À préciser"));
+  form.append("kitchen", String(data.kitchen || "À préciser"));
   const equipements = data.equipements ?? [];
   form.append("airConditioning", String(equipements.includes("Climatisation")));
   form.append("wifi", String(equipements.includes("Wi-Fi")));
@@ -92,25 +93,19 @@ function modifierLocale(id, patch) {
 }
 
 export async function getMesAnnonces() {
-  if (USE_MOCKS) {
-    await attendre(300);
-    return lireMesAnnoncesLocales();
-  }
-  const { data } = await apiClient.get("/announcer/announces");
+  if (USE_MOCKS) { await attendre(300); return lireMesAnnoncesLocales(); }
+  const { data } = await apiClient.get("/announcer/announces", { params: { page: 1, limit: 100 } });
   const liste = Array.isArray(data) ? data : (data?.data ?? []);
-  return liste.map((a) => ({
-    ...a,
-    id: a.id ?? a.announceId,
-    titre: a.titre ?? `${a.type} · ${a.neighborhood}`,
-    ville: a.ville ?? a.city,
-    quartier: a.quartier ?? a.neighborhood,
-    loyer: Number(a.loyer ?? a.rent),
-    cautionMois: Number(a.cautionMois ?? a.deposit ?? 0),
-    avanceMois: Number(a.avanceMois ?? a.advance ?? 0),
-    statut: a.statut ?? (a.status === "rented" ? "loue" : a.paused ? "pause" : "disponible"),
-    modifieLe: a.modifieLe ?? a.updatedAt ?? new Date().toISOString(),
-    photos: (a.photos ?? (a.image?.path ? [a.image.path] : [])).map(urlPhoto),
-  }));
+  return liste.map((a) => {
+    const id = a.id ?? a.announceId;
+    const paused = Boolean(a.paused) || a.status === "paused";
+    const rawPhotos = a.photos ?? a.images ?? (a.image?.path ? [a.image] : []);
+    const photos = (Array.isArray(rawPhotos) ? rawPhotos : [rawPhotos])
+      .map((photo) => typeof photo === "string" ? photo : photo?.path)
+      .filter(Boolean)
+      .map(urlPhoto);
+    return { ...a, id, titre: a.titre ?? `${a.type} · ${a.neighborhood}`, ville: a.ville ?? a.city, quartier: a.quartier ?? a.neighborhood, repere: a.repere ?? a.landmark, loyer: Number(a.loyer ?? a.rent), cautionMois: Number(a.cautionMois ?? a.deposit ?? 0), avanceMois: Number(a.avanceMois ?? a.advance ?? 0), statut: paused ? "pause" : (a.statut ?? (a.status === "rented" ? "loue" : "disponible")), modifieLe: a.modifieLe ?? a.updatedAt ?? new Date().toISOString(), photos };
+  });
 }
 
 export async function modifierPrix(id, loyer) {
@@ -118,30 +113,23 @@ export async function modifierPrix(id, loyer) {
     await attendre(300);
     return modifierLocale(id, { loyer: Number(loyer), modifieLe: new Date().toISOString() });
   }
-  const { data } = await apiClient.patch(`/announcer/announces/${id}/price`, { loyer: Number(loyer) });
+  const { data } = await apiClient.patch(`/announcer/announces/${id}/rent`, { rent: Number(loyer) });
   return data;
 }
 
 /** statut : "disponible" | "pause" | "loue" */
 export async function changerStatut(id, statut) {
-  if (USE_MOCKS) {
-    await attendre(300);
-    return modifierLocale(id, {
-      statut,
-      modifieLe: new Date().toISOString(),
-      ...(statut === "loue" ? { loueLe: new Date().toISOString() } : {}),
-    });
-  }
-  const { data } = await apiClient.patch(`/announcer/announces/${id}/status`, { statut });
+  if (USE_MOCKS) { await attendre(300); return modifierLocale(id, { statut, modifieLe: new Date().toISOString() }); }
+  if (statut === "pause") { const { data } = await apiClient.patch(`/announcer/announces/${id}/pause`, { paused: true }); return data; }
+  const status = statut === "loue" ? "rented" : statut === "disponible" ? "available" : null;
+  if (!status) throw new Error("STATUT_NON_SUPPORTÉ");
+  const { data } = await apiClient.patch(`/announcer/announces/${id}/status`, { status });
   return data;
 }
 
 /** « Oui, toujours disponible » */
 export async function confirmerDisponibilite(id) {
-  if (USE_MOCKS) {
-    await attendre(300);
-    return modifierLocale(id, { statut: "disponible", modifieLe: new Date().toISOString() });
-  }
-  const { data } = await apiClient.post(`/announcer/announces/${id}/confirm`);
+  if (USE_MOCKS) return modifierLocale(id, { statut: "disponible", modifieLe: new Date().toISOString() });
+  const { data } = await apiClient.patch(`/announcer/announces/${id}/status`, { status: "available" });
   return data;
 }
