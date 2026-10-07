@@ -1,7 +1,7 @@
 const selectAnnounces = `
     SELECT
         a.announce_id,
-        a.status,
+        CASE WHEN COALESCE(c.hidden,FALSE) THEN 'hidden' WHEN COALESCE(c.paused,FALSE) THEN 'paused' ELSE a.status END AS effective_status,
         a.rent,
         a.type,
         a.city,
@@ -40,6 +40,7 @@ const selectAnnounces = `
         ) AS image_count
 
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 
     LEFT JOIN equipments e
         ON e.announce_id = a.announce_id
@@ -48,6 +49,7 @@ const selectAnnounces = `
 const countAnnounces = `
     SELECT COUNT(*)
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 
     LEFT JOIN equipments e
         ON e.announce_id = a.announce_id
@@ -56,6 +58,7 @@ const countAnnounces = `
 const selectAnnounceById = `
     SELECT
         a.announce_id,
+        CASE WHEN COALESCE(c.hidden,FALSE) THEN 'hidden' WHEN COALESCE(c.paused,FALSE) THEN 'paused' ELSE a.status END AS effective_status,
         a.city,
         a.neighborhood,
         a.type,
@@ -102,6 +105,7 @@ const selectAnnounceById = `
         ) AS announce_count
 
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 
     LEFT JOIN equipments e
         ON e.announce_id = a.announce_id
@@ -110,12 +114,15 @@ const selectAnnounceById = `
         ON an.announcer_id = a.announcer_id
 
     WHERE a.announce_id = $1
+      AND a.status = 'available'
+      AND COALESCE(c.hidden, FALSE) = FALSE
+      AND COALESCE(c.paused, FALSE) = FALSE
 `;
 
 const selectLatestAnnounces = `
     SELECT
         a.announce_id,
-        a.status,
+        CASE WHEN COALESCE(c.hidden,FALSE) THEN 'hidden' WHEN COALESCE(c.paused,FALSE) THEN 'paused' ELSE a.status END AS effective_status,
         a.rent,
         a.type,
         a.city,
@@ -154,12 +161,11 @@ const selectLatestAnnounces = `
         ) AS image_count
 
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 
     LEFT JOIN equipments e
         ON e.announce_id = a.announce_id
 
-    ORDER BY a.created_at DESC
-    LIMIT 4
 `;
 
 export {

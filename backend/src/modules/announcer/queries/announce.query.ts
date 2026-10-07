@@ -8,10 +8,17 @@ const selectAnnounces = `
         a.city,
         a.created_at,
         a.rent,
+        a.deposit,
+        a.advance,
+        a.available_at,
+        a.landmark,
+        a.description,
+        a.favor_time,
 
         (a.rent * a.advance) + (a.rent * a.deposit) AS total,
 
         a.status,
+        COALESCE(c.paused, FALSE) AS paused,
         a.updated_at,
 
         (
@@ -26,11 +33,13 @@ const selectAnnounces = `
         ) AS image
 
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 `;
 
 const countAnnounces = `
     SELECT COUNT(*)
     FROM announces a
+    LEFT JOIN announce_controls c ON c.announce_id = a.announce_id
 `;
 
 const updatedSatusAnnounce = `

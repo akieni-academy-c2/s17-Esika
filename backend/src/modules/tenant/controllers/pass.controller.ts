@@ -24,12 +24,9 @@ const buyPass = async (req: Request, res: Response) => {
 		throw new AppError(400, "L'identifiant de l'annonce est invalide");
 	}
 
-	await createPass({ announceId, tenantId });
+	const pass = await createPass({ announceId, tenantId });
 
-	res.status(201).json({
-		message: "Pass créé avec succès",
-		status: 201,
-	});
+	res.status(201).json({ message: "Pass créé avec succès", status: 201, data: pass });
 };
 
 const passInfoController = async (req: Request, res: Response) => {

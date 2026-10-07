@@ -24,6 +24,14 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 		throw new AppError(400, "Champ(s) obligatoire(s) manquant(s)");
 	}
 
+	const city = String(data.city).trim().toLowerCase();
+	if (city !== "brazzaville" && city !== "pointe-noire") {
+		throw new AppError(400, "Ville invalide");
+	}
+	if (String(data.password).length < 8) {
+		throw new AppError(400, "Le mot de passe doit contenir au moins 8 caractères");
+	}
+
 	// Validation du numéro de téléphone
 	const regexNumber = /^\+?\d{5,15}$/;
 	if (!regexNumber.test(data.phoneNumber)) {
@@ -43,8 +51,8 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 	// Hashage du mot de passe
 	const passwordHash = await bcrypt.hash(data.password, 10);
 
-	// Formater le nom de la ville en minuscules
-	const city = data.city.toLowerCase() as City;
+	// La ville a déjà été normalisée et validée ci-dessus.
+	const cityTyped = city as City;
 
 	// Enregistrement de l'annonceur
 	await registerAnnouncer({
@@ -53,7 +61,7 @@ const signUpAnnouncer = async (req: Request, res: Response) => {
 		firstName: data.firstName,
 		email: data.email,
 		password: passwordHash,
-		city,
+		city: cityTyped,
 	});
 
 	res.status(201).json({
@@ -76,13 +84,9 @@ const signInAnnouncer = async (req: Request, res: Response) => {
 		throw new AppError(400, "Format numéro de téléphone invalide");
 	}
 
-	const token = await loginAnnouncer(data);
+	const result = await loginAnnouncer(data);
 
-	res.status(200).json({
-		message: "Connexion réussie",
-		status: 200,
-		token
-	})
+	res.status(200).json({ message: "Connexion réussie", status: 200, token: result.token, user: result.user });
 }
 
 export { signUpAnnouncer, signInAnnouncer };

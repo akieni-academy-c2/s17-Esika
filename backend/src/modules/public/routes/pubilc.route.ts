@@ -4,7 +4,9 @@ import { displayAnnounces, detailAnnounceById, displayLatestAnnounces } from "..
 const router = Router();
 
 router.get('/announces', displayAnnounces);
-router.get('/lastest-announces', displayLatestAnnounces)
+router.get('/lastest-announces', displayLatestAnnounces);
+router.get('/latest-announces', displayLatestAnnounces)
+router.get('/announces/latest', displayLatestAnnounces)
 router.get('/announces/:id', detailAnnounceById);
 
 export default router
