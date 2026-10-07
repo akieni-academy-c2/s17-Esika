@@ -25,7 +25,7 @@ const registerTenant = async ({
 	]);
 };
 
-const loginTenant = async ({ phoneNumber, password }: LoginData): Promise<string> => {
+const loginTenant = async ({ phoneNumber, password }: LoginData) => {
 	const results = await pool.query(selectTenantByPhoneNumber, [phoneNumber]);
 
 	const tenant = results.rows[0];
@@ -51,7 +51,7 @@ const loginTenant = async ({ phoneNumber, password }: LoginData): Promise<string
 		},
 	);
 
-	return token;
+	return { token, user: { id: tenant.tenant_id, firstName: tenant.first_name, lastName: tenant.last_name, city: tenant.city, phoneNumber: tenant.phone_number } };
 };
 
 export { registerTenant, loginTenant };

@@ -4,10 +4,17 @@ const selectReports = `
         r.reason,
         r.status,
         r.created_at,
+        r.updated_at,
+        r.description,
+        r.handled_at,
+        r.handled_action,
+        a.announce_id,
 
         a.type,
         a.neighborhood,
         a.city,
+        a.rent,
+        a.created_at AS announce_created_at,
 
         (
             SELECT COUNT(*)::int

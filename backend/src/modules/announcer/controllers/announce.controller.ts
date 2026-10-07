@@ -8,6 +8,7 @@ import {
 	modifyStatusAnnonce,
 } from "../services/announce.service.ts";
 import type { City } from "../../../types/register.type.ts";
+import pool from "../../../config/database.ts";
 
 const sharedAnnounce = async (req: Request, res: Response) => {
 	const data = req.body;
@@ -21,18 +22,17 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 		securityGuard: data.securityGuard === "true",
 	};
 
-	// Champs obligatoires
+	// Champs indispensables dans le parcours actuel.
+	// sanitary, kitchen et favorTime ne sont pas encore demandés par l'interface ;
+	// on leur applique donc une valeur neutre plutôt que de rejeter la publication.
 	if (
-		!data.type ||
-		!data.rent ||
-		!data.city ||
-		!data.neighborhood ||
-		!data.deposit ||
-		!data.advance ||
-		!data.sanitary ||
-		!data.kitchen ||
-		!data.landmark ||
-		!data.favorTime
+		!String(data.type ?? "").trim() ||
+		data.rent === undefined || data.rent === "" ||
+		!String(data.city ?? "").trim() ||
+		!String(data.neighborhood ?? "").trim() ||
+		data.deposit === undefined || data.deposit === "" ||
+		data.advance === undefined || data.advance === "" ||
+		!String(data.landmark ?? "").trim()
 	) {
 		throw new AppError(400, "Champ(s) obligatoire(s) manquant(s)");
 	}
@@ -58,8 +58,12 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 		throw new AppError(400, "Le montant de l'avance est invalide");
 	}
 
-	// Formatage de la ville
-	const city = data.city.toLowerCase() as City;
+	// Formatage et validation de la ville avant PostgreSQL.
+	const cityValue = String(data.city).trim().toLowerCase();
+	if (cityValue !== "brazzaville" && cityValue !== "pointe-noire") {
+		throw new AppError(400, "Ville invalide");
+	}
+	const city = cityValue as City;
 
 	// Récupération de l'annonceur connecté
 	const announcerId = req.user!.userId;
@@ -67,10 +71,21 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 	// Récupération des images
 	const files = (req.files as Express.Multer.File[]) || [];
 
-	const availableAt = data.availableAt ? new Date(data.availableAt) : undefined;
+	let availableAt: Date | undefined;
+	if (data.availableAt) {
+		const parsedDate = new Date(data.availableAt);
+		if (Number.isNaN(parsedDate.getTime())) {
+			throw new AppError(400, "La date de disponibilité est invalide");
+		}
+		availableAt = parsedDate;
+	}
+
+	const sanitary = String(data.sanitary ?? "").trim() || "À préciser";
+	const kitchen = String(data.kitchen ?? "").trim() || "À préciser";
+	const favorTime = String(data.favorTime ?? "").trim() || "À préciser";
 
 	// Création de l'annonce
-	await createAnnounce(
+	const created = await createAnnounce(
 		{
 			type: data.type,
 			rent,
@@ -81,12 +96,12 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 			announcerId,
 			description: data.description,
 			availableAt,
-			sanitary: data.sanitary,
-			kitchen: data.kitchen,
+			sanitary,
+			kitchen,
 			address: data.address,
 			landmark: data.landmark,
 			waterElectricity: data.waterElectricity,
-			favorTime: data.favorTime,
+			favorTime,
 			equipment,
 		},
 		files,
@@ -95,6 +110,7 @@ const sharedAnnounce = async (req: Request, res: Response) => {
 	res.status(201).json({
 		message: "Annonce créée avec succès",
 		status: 201,
+		data: { id: created.id, announceId: created.announce_id },
 	});
 };
 
@@ -134,26 +150,25 @@ const getMyAnnounces = async (req: Request, res: Response) => {
 const updateStatusAnnonce = async (req: Request, res: Response) => {
 	const announceId = Number(req.params.id);
 	const announcerId = req.user!.userId;
-	const { status } = req.body;
+	const rawStatus = req.body.status ?? req.body.statut;
 
 	if (!Number.isInteger(announceId) || announceId < 1) {
 		throw new AppError(400, "L'identifiant de l'annonce est invalide");
 	}
 
-	if (status !== "available" && status !== "rented") {
-		throw new AppError(400, "Le statut doit être available ou rented");
-	}
+	const statusMap: Record<string, "available" | "rented"> = {
+		available: "available", rented: "rented", disponible: "available", loue: "rented",
+	};
+	const status = statusMap[String(rawStatus ?? "")];
+	if (!status) throw new AppError(400, "Statut invalide");
 
-	const statusUpdated = await modifyStatusAnnonce(
-		status,
-		announceId,
-		announcerId,
-	);
+	const statusUpdated = await modifyStatusAnnonce(status, announceId, announcerId);
+	await pool.query(`INSERT INTO announce_controls (announce_id, paused) VALUES ($1, FALSE) ON CONFLICT (announce_id) DO UPDATE SET paused = FALSE, updated_at = NOW()`, [announceId]);
 
 	res.status(200).json({
 		message: "Le statut de l'annonce a été mis à jour avec succès",
 		status: 200,
-		data: statusUpdated,
+		data: { status: statusUpdated, statut: statusUpdated === "rented" ? "loue" : "disponible" },
 	});
 };
 
@@ -183,4 +198,15 @@ const updateRentAnnonce = async (req: Request, res: Response) => {
 	});
 };
 
-export { sharedAnnounce, getMyAnnounces, updateStatusAnnonce, updateRentAnnonce };
+const updatePauseAnnonce = async (req: Request, res: Response) => {
+	const announceId = Number(req.params.id);
+	const announcerId = req.user!.userId;
+	const paused = req.body.paused !== false;
+	if (!Number.isInteger(announceId) || announceId < 1) throw new AppError(400, "L'identifiant de l'annonce est invalide");
+	const result = await pool.query(`UPDATE announces SET updated_at = NOW() WHERE announce_id = $1 AND announcer_id = $2 RETURNING announce_id`, [announceId, announcerId]);
+	if (result.rowCount === 0) throw new AppError(404, "Annonce introuvable");
+	await pool.query(`INSERT INTO announce_controls (announce_id, paused) VALUES ($1, $2) ON CONFLICT (announce_id) DO UPDATE SET paused = EXCLUDED.paused, updated_at = NOW()`, [announceId, paused]);
+	res.status(200).json({ message: paused ? "Annonce mise en pause" : "Annonce remise en ligne", status: 200, data: { paused } });
+};
+
+export { sharedAnnounce, getMyAnnounces, updateStatusAnnonce, updateRentAnnonce, updatePauseAnnonce };

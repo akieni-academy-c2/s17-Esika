@@ -10,6 +10,13 @@ type ReportItem = {
 	reason: string;
 	status: ReportStatus;
 	createdAt: Date;
+	updatedAt?: Date;
+	description?: string | null;
+	handledAt?: Date | null;
+	action?: string | null;
+	announceId?: number;
+	loyer?: number;
+	publieLe?: Date;
 	reportCount: number;
 	announce: {
 		type: string;

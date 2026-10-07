@@ -20,13 +20,9 @@ const signInAdmin = async (req: Request, res: Response) => {
 		throw new AppError(400, "Format numéro de téléphone invalide");
 	}
 
-	const token = await loginAdmin(data);
+	const result = await loginAdmin(data);
 
-	res.status(200).json({
-		message: "Connexion réussie",
-		status: 200,
-		token,
-	});
+	res.status(200).json({ message: "Connexion réussie", status: 200, token: result.token, user: result.user });
 };
 
 export { signInAdmin };

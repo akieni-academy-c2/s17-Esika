@@ -27,6 +27,7 @@ export type PaginationParams = {
 
 export type Announce = {
     announceId: number;
+    city: City;
     image?: AnnounceImage;
     status: string;
     rent: number;
@@ -54,6 +55,7 @@ export type AnnounceResponse = {
 export type AnnounceDetail = {
     announceId: number;
     city: City;
+    status?: string;
     neighborhood: string;
     type: string;
     availableAt?: Date;
@@ -72,6 +74,7 @@ export type AnnounceDetail = {
     lastName: string;
     firstName: string;
     announceCount: number;
+    proprietaire?: { firstName: string; lastName: string };
 
     favorTime: string;
 

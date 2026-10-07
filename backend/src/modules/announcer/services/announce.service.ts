@@ -19,133 +19,40 @@ import { insertEquipment } from "../queries/equipment.query.ts";
 import AppError from "../../../utils/app-error.ts";
 
 const createAnnounce = async (
-	data: CreateAnnounce,
-	files: Express.Multer.File[],
+  data: CreateAnnounce,
+  files: Express.Multer.File[],
 ) => {
-	if (files.length === 0) {
-		const result = await pool.query(insertAnnounce, [
-			data.type,
-			data.rent,
-			data.city,
-			data.neighborhood,
-			data.deposit,
-			data.advance,
-			data.announcerId,
-			data.description,
-			data.availableAt,
-			data.sanitary,
-			data.kitchen,
-			data.address,
-			data.landmark,
-			data.waterElectricity,
-			data.favorTime,
-		]);
-
-		const announce = result.rows[0];
-
-		await pool.query(insertEquipment, [
-			data.equipment.airConditioning,
-			data.equipment.wifi,
-			data.equipment.generator,
-			data.equipment.parking,
-			data.equipment.furnished,
-			data.equipment.securityGuard,
-			announce.announce_id,
-		]);
-	}
-
-	const client = await pool.connect();
-
-	const uploadedFiles: string[] = [];
-
-	try {
-		await client.query("BEGIN");
-
-		const result = await client.query(insertAnnounce, [
-			data.type,
-			data.rent,
-			data.city,
-			data.neighborhood,
-			data.deposit,
-			data.advance,
-			data.announcerId,
-			data.description,
-			data.availableAt,
-			data.sanitary,
-			data.kitchen,
-			data.address,
-			data.landmark,
-			data.waterElectricity,
-			data.favorTime,
-		]);
-
-		const announce = result.rows[0];
-
-		await client.query(insertEquipment, [
-			data.equipment.airConditioning,
-			data.equipment.wifi,
-			data.equipment.generator,
-			data.equipment.parking,
-			data.equipment.furnished,
-			data.equipment.securityGuard,
-			announce.announce_id,
-		]);
-
-		for (const file of files) {
-			// Normaliser le nom d'un fichier
-			const safeName = file.originalname
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "")
-				.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-			const fileName = `${crypto.randomUUID()}-${safeName}`;
-			const storagePath = `${announce.announce_id}/${fileName}`;
-
-			const { error } = await supabase.storage
-				.from("announce")
-				.upload(storagePath, file.buffer, {
-					contentType: file.mimetype,
-					upsert: false,
-				});
-
-			if (error) {
-				throw error;
-			}
-
-			const { data } = supabase.storage
-				.from("announce")
-				.getPublicUrl(storagePath);
-
-			const path = data.publicUrl;
-
-			uploadedFiles.push(path);
-		}
-
-		for (let i = 0; i < files.length; i++) {
-			const file = files[i];
-			const path = uploadedFiles[i];
-
-			await client.query(insertImage, [
-				file.mimetype,
-				file.originalname,
-				path,
-				announce.announce_id,
-			]);
-		}
-
-		await client.query("COMMIT");
-
-		return announce;
-	} catch (error) {
-		await client.query("ROLLBACK");
-
-		if (uploadedFiles.length > 0) {
-			await supabase.storage.from("announce").remove(uploadedFiles);
-		}
-		throw error;
-	} finally {
-		client.release();
-	}
+  const client = await pool.connect();
+  const uploadedStoragePaths: string[] = [];
+  try {
+    await client.query("BEGIN");
+    const result = await client.query(insertAnnounce, [
+      data.type, data.rent, data.city, data.neighborhood, data.deposit, data.advance,
+      data.announcerId, data.description, data.availableAt, data.sanitary, data.kitchen,
+      data.address, data.landmark, data.waterElectricity, data.favorTime,
+    ]);
+    const announce = result.rows[0];
+    await client.query(insertEquipment, [
+      data.equipment.airConditioning, data.equipment.wifi, data.equipment.generator,
+      data.equipment.parking, data.equipment.furnished, data.equipment.securityGuard,
+      announce.announce_id,
+    ]);
+    for (const file of files) {
+      const safeName = file.originalname.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9._-]/g, "_");
+      const storagePath = `${announce.announce_id}/${crypto.randomUUID()}-${safeName}`;
+      const { error } = await supabase.storage.from("announce").upload(storagePath, file.buffer, { contentType: file.mimetype, upsert: false });
+      if (error) throw error;
+      uploadedStoragePaths.push(storagePath);
+      const { data: publicData } = supabase.storage.from("announce").getPublicUrl(storagePath);
+      await client.query(insertImage, [file.mimetype, file.originalname, publicData.publicUrl, announce.announce_id]);
+    }
+    await client.query("COMMIT");
+    return { ...announce, id: announce.announce_id };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    if (uploadedStoragePaths.length) await supabase.storage.from("announce").remove(uploadedStoragePaths);
+    throw error;
+  } finally { client.release(); }
 };
 
 const getAnnounces = async (
@@ -204,9 +111,16 @@ const getAnnounces = async (
             city: announce.city,
             createdAt: announce.created_at,
             rent: Number(announce.rent),
-            total: Number(announce.total),
-            status: announce.status,
+            deposit: Number(announce.deposit ?? 0),
+            advance: Number(announce.advance ?? 0),
+            total: Number(announce.total ?? 0),
+            status: announce.paused ? "paused" : announce.status,
+            paused: Boolean(announce.paused),
             updatedAt: announce.updated_at,
+            availableAt: announce.available_at,
+            landmark: announce.landmark,
+            description: announce.description,
+            favorTime: announce.favor_time,
         })),
         pagination: {
             total,

@@ -32,7 +32,7 @@ const getAnnounces = async (
 		securityGuard,
 	} = params;
 
-	const conditions: string[] = [];
+	const conditions: string[] = ["COALESCE(c.hidden, FALSE) = FALSE", "COALESCE(c.paused, FALSE) = FALSE", "a.status = 'available'"];
 	const values: (string | number | boolean)[] = [];
 
 	const addCondition = (
@@ -117,8 +117,9 @@ const getAnnounces = async (
 	return {
 		data: announcesResult.rows.map((announce) => ({
 			announceId: announce.announce_id,
+			city: announce.city,
 			image: announce.image,
-			status: announce.status,
+			status: announce.effective_status ?? announce.status,
 			rent: Number(announce.rent),
 			type: announce.type,
 			neighborhood: announce.neighborhood,
@@ -157,6 +158,7 @@ const getAnnounceById = async (announceId: number): Promise<AnnounceDetail> => {
 	return {
 		announceId,
 		city: announce.city,
+		status: announce.effective_status ?? announce.status,
 		neighborhood: announce.neighborhood,
 		type: announce.type,
 		availableAt: announce.available_at,
@@ -171,6 +173,7 @@ const getAnnounceById = async (announceId: number): Promise<AnnounceDetail> => {
 		firstName: announce.first_name,
 		lastName: announce.last_name,
 		announceCount: Number(announce.announce_count),
+		proprietaire: { firstName: announce.first_name, lastName: announce.last_name },
 		favorTime: announce.favor_time,
 		advanceAmount,
 		cautionAmount,
@@ -179,12 +182,13 @@ const getAnnounceById = async (announceId: number): Promise<AnnounceDetail> => {
 };
 
 const getLastestAnnounce = async (): Promise<Announce[]> => {
-	const results = await pool.query(selectLatestAnnounces);
+	const results = await pool.query(`${selectLatestAnnounces} WHERE a.status = 'available' AND COALESCE(c.paused,FALSE) = FALSE AND COALESCE(c.hidden,FALSE) = FALSE ORDER BY a.created_at DESC LIMIT 4`);
 
 	const announces = results.rows.map((announce) => ({
 		announceId: announce.announce_id,
+		city: announce.city,
 		image: announce.image,
-		status: announce.status,
+		status: announce.effective_status ?? announce.status,
 		rent: Number(announce.rent),
 		type: announce.type,
 		neighborhood: announce.neighborhood,
