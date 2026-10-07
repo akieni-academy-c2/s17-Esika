@@ -1,0 +1,155 @@
+/* =====================================================================
+   Pages de connexion / inscription (wireframes : panneau sombre + formulaire)
+   ===================================================================== */
+.auth { min-height: 100vh; display: grid; color: #211b18; background: #fff; }
+
+/* ---------- Panneau sombre (gauche) ---------- */
+.auth__panneau {
+  background: #211b18; color: #fff; padding: 20px 20px 22px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.auth__logo { display: inline-flex; align-items: center; gap: 0.55rem; align-self: flex-start; color: #fff; font-weight: 800; font-size: 1.15rem; letter-spacing: 0.2em; }
+.auth__logo-mark { width: 0.7rem; height: 0.7rem; background: #ad4630; }
+
+.auth__bloc { animation: auth-in 0.35s ease-out backwards; }
+@keyframes auth-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.auth__eyebrow { margin: 0 0 12px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #f0a995; }
+.auth__titre { margin: 0 0 22px; font-size: clamp(1.6rem, 4.2vw, 2.6rem); line-height: 1.12; letter-spacing: -0.025em; font-weight: 800; }
+.auth__atouts { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.auth__atouts li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.95rem; line-height: 1.4; color: #efe9e2; }
+.auth__atouts svg { flex: none; margin-top: 2px; color: #f0a995; }
+
+.auth__alerte {
+  display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 16px 18px;
+  background: #2f2825; border-radius: 14px; font-size: 0.85rem; line-height: 1.45; color: #e7dfd7;
+}
+.auth__alerte svg { flex: none; margin-top: 1px; color: #f0a995; }
+
+/* ---------- Zone formulaire (droite) ---------- */
+.auth__contenu { display: grid; place-items: center; padding: 28px 20px 56px; }
+.auth__form { width: 100%; max-width: 440px; display: grid; gap: 6px; }
+.auth__form form { display: grid; gap: 6px; }
+.auth__form h1 { margin: 0; font-size: 1.85rem; line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
+.auth__sous { margin: 2px 0 14px; color: #6b625c; line-height: 1.5; }
+.auth__form label { margin-top: 8px; font-size: 0.8rem; font-weight: 600; color: #4a423d; }
+.auth__facultatif { font-weight: 400; color: #8a817a; }
+
+/* Champs */
+.auth__input, .auth__tel {
+  width: 100%; min-height: 50px; border: 1px solid #d9d2c7; border-radius: 12px; background: #fff;
+  color: #211b18; font: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.auth__input { padding: 0 14px; }
+.auth__input::placeholder, .auth__tel input::placeholder { color: #a39a92; }
+.auth__input:hover, .auth__tel:hover { border-color: #b9b2a6; }
+.auth__input:focus, .auth__tel:focus-within { outline: none; border-color: #ad4630; box-shadow: 0 0 0 4px rgba(173, 70, 48, 0.14); }
+.auth__input:disabled { background: #f6f3ee; }
+
+.auth__tel { display: flex; align-items: stretch; overflow: hidden; }
+.auth__tel span { display: grid; place-items: center; padding: 0 14px; font-weight: 700; border-right: 1px solid #e6e0d6; color: #211b18; }
+.auth__tel input { flex: 1; min-width: 0; border: 0; padding: 0 14px; font: inherit; color: inherit; background: transparent; outline: none; }
+
+/* Mot de passe + œil */
+.auth__mdp { position: relative; }
+.auth__mdp .auth__input { padding-right: 48px; }
+.auth__oeil {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 38px; height: 38px;
+  display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: #7a716b; cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.auth__oeil:hover { background: #f4f1ea; color: #211b18; }
+
+/* Aides, messages */
+.auth__aide { margin: 2px 0; font-size: 0.78rem; color: #7a716b; }
+.auth__demo { display: inline-block; justify-self: start; margin: 4px 0 0; padding: 5px 10px; border-radius: 8px; background: #fcefd8; color: #5a3e00; font-size: 0.78rem; font-weight: 600; }
+.auth__erreur { min-height: 20px; margin: 6px 0 4px; font-size: 0.85rem; color: #b3261e; }
+.auth__note { margin: 14px 0 0; font-size: 0.78rem; line-height: 1.5; text-align: center; color: #7a716b; }
+.auth__info {
+  display: flex; align-items: flex-start; gap: 12px; margin: 14px 0 4px; padding: 14px 16px;
+  background: #e3ede8; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; color: #1d3d33;
+}
+.auth__info svg { flex: none; margin-top: 2px; color: #2d5b4c; }
+
+/* Bas de page : filet + lien */
+.auth__bas { margin: 18px 0 0; padding-top: 18px; border-top: 1px solid #e6e0d6; text-align: center; font-size: 0.88rem; color: #4a423d; }
+.auth__bas a, .auth__lien { color: #ad4630; font-weight: 700; background: none; border: 0; padding: 0; font: inherit; font-weight: 700; cursor: pointer; }
+.auth__bas a:hover, .auth__lien:hover { text-decoration: underline; }
+
+/* Cases à cocher */
+.auth__check { display: flex; align-items: flex-start; gap: 10px; margin-top: 6px !important; font-size: 0.85rem !important; font-weight: 400 !important; line-height: 1.45; color: #4a423d !important; cursor: pointer; }
+.auth__check input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: #ad4630; cursor: pointer; }
+.auth__check--cgu { margin-top: 12px !important; }
+.auth__check strong { color: #211b18; }
+.auth__cgu-lien { color: #ad4630; font-weight: 600; }
+
+/* Étapes : 1 Votre profil ── 2 Vérification */
+.auth__etapes { display: flex; align-items: center; list-style: none; margin: 0 0 14px; padding: 0; font-size: 0.85rem; color: #8a817a; }
+.auth__etapes li { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.auth__etapes li + li::before { content: ''; width: 44px; height: 1px; margin-inline: 12px 4px; background: #d9d2c7; }
+.auth__puce { width: 24px; height: 24px; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid #cfc8bc; font-size: 0.75rem; font-weight: 700; color: #7a716b; background: #fff; }
+.auth__etapes .is-actif { color: #211b18; }
+.auth__etapes .is-actif .auth__puce { background: #211b18; border-color: #211b18; color: #fff; }
+.auth__etapes .is-fait { color: #211b18; }
+.auth__etapes .is-fait .auth__puce { background: #2d5b4c; border-color: #2d5b4c; color: #fff; }
+
+/* Choix du rôle : deux cartes */
+.auth__roles { border: 0; padding: 0; margin: 2px 0 6px; min-width: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+.auth__roles legend { margin-bottom: 8px; padding: 0; font-size: 0.8rem; font-weight: 600; color: #4a423d; }
+.auth__role {
+  position: relative; display: flex; align-items: center; gap: 12px; margin: 0 !important; padding: 12px 14px;
+  border: 1px solid #e0dacf; border-radius: 14px; background: #fff; cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.auth__role:hover { border-color: #b9b2a6; background: #fdfcfa; }
+.auth__role.is-actif { border-color: #211b18; box-shadow: inset 0 0 0 1px #211b18; }
+.auth__role:focus-within { outline: 2px solid #ad4630; outline-offset: 2px; }
+.auth__role input { position: absolute; opacity: 0; pointer-events: none; }
+.auth__role-icone { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; }
+.auth__role--locataire .auth__role-icone { background: #f9e1dc; color: #ad4630; }
+.auth__role--proprietaire .auth__role-icone { background: #e3ede8; color: #2d5b4c; }
+.auth__role-texte { display: grid; gap: 1px; min-width: 0; }
+.auth__role-texte strong { font-size: 0.9rem; line-height: 1.25; color: #211b18; }
+.auth__role-texte small { font-size: 0.78rem; font-weight: 400; color: #7a716b; }
+
+/* Duos de champs, choix de ville */
+.auth__duo { display: grid; grid-template-columns: 1fr; gap: 4px 12px; }
+.auth__segment { display: flex; gap: 2px; padding: 4px; min-height: 50px; background: #f0ece4; border-radius: 12px; }
+.auth__segment button {
+  flex: 1; border: 0; border-radius: 9px; background: transparent; padding: 0 8px; font: inherit; font-size: 0.85rem; color: #4a423d; cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+.auth__segment .is-actif { background: #fff; color: #211b18; font-weight: 700; box-shadow: 0 1px 3px rgba(33, 27, 24, 0.14); }
+
+/* Code SMS : 6 cases */
+.code { display: flex; gap: 10px; margin: 4px 0 6px; }
+.code__case {
+  flex: 1; min-width: 0; max-width: 60px; aspect-ratio: 1; text-align: center; font: inherit; font-size: 1.5rem; font-weight: 700; color: #211b18;
+  background: #fff; border: 1px solid #d9d2c7; border-radius: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.code__case:hover { border-color: #b9b2a6; }
+.code__case:focus { outline: none; border-color: #211b18; box-shadow: 0 0 0 4px rgba(33, 27, 24, 0.1); }
+
+/* ---------- Écran large : panneau à gauche (≈ 40 %) ---------- */
+@media (min-width: 900px) {
+  .auth { grid-template-columns: minmax(380px, 40%) 1fr; }
+  .auth__panneau { position: sticky; top: 0; height: 100vh; padding: 52px 52px 44px; gap: 0; justify-content: space-between; }
+  .auth__bloc { margin-block: auto; padding-block: 32px; max-width: 460px; }
+  .auth__titre { margin-bottom: 30px; }
+  .auth__contenu { padding: 56px 40px; }
+  .auth__duo { grid-template-columns: 1fr 1fr; }
+  .auth__roles { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Mobile : panneau compact (logo + titre), le formulaire monte ---------- */
+@media (max-width: 899px) {
+  .auth__panneau { padding: 18px 20px 20px; gap: 14px; }
+  .auth__eyebrow { margin-bottom: 8px; }
+  .auth__titre { margin: 0; font-size: 1.5rem; }
+  .auth__atouts, .auth__alerte { display: none; }
+  .auth__contenu { place-items: start center; padding-top: 24px; }
+}
+@media (min-width: 640px) and (max-width: 899px) {
+  .auth__duo { grid-template-columns: 1fr 1fr; }
+  .auth__roles { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,37 @@
+.sig__declencheur { border: 1px solid #211b18; background: #fff; color: #211b18; border-radius: 10px; padding: 8px 14px;
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.sig__declencheur--bloc { width: 100%; padding: 12px; font-size: 14px; background: #f4f1ea; border-color: #e3ddd2; }
+
+.sig__fond { position: fixed; inset: 0; background: rgba(33, 27, 24, .55); display: grid; place-items: center; padding: 16px; z-index: 1000; }
+.sig__boite { background: #fff; border-radius: 16px; padding: 22px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; color: #211b18; outline: none; }
+.sig__boite h2 { margin: 0 0 4px; font-size: 20px; }
+.sig__sous { margin: 0 0 14px; color: #6b625c; font-size: 13px; }
+.sig__motifs { border: 0; padding: 0; margin: 0 0 8px; display: grid; gap: 8px; }
+.sig__motifs legend { font-size: 13px; font-weight: 600; margin-bottom: 8px; padding: 0; }
+.sig__motifs label { display: flex; gap: 10px; align-items: center; border: 1px solid #e3ddd2; border-radius: 10px; padding: 11px 12px; cursor: pointer; font-size: 14px; }
+.sig__motifs label.is-actif { border: 2px solid #211b18; padding: 10px 11px; }
+.sig__motifs input { accent-color: #211b18; }
+.sig__label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 6px; }
+.sig__champ { width: 100%; box-sizing: border-box; border: 1px solid #cfc8bc; border-radius: 10px; padding: 12px; font: inherit; resize: vertical; }
+.sig__champ:focus { outline: 2px solid #ad4630; outline-offset: 1px; }
+.sig__erreur { min-height: 18px; color: #b3261e; font-size: 13px; margin: 8px 0 0; }
+.sig__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.sig__btn { border: 1px solid #211b18; background: #fff; color: #211b18; border-radius: 10px; padding: 11px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+.sig__btn--plein { background: #ad4630; border-color: #ad4630; color: #fff; }
+.sig__btn:disabled { opacity: .6; cursor: default; }
+.sig__fin { text-align: center; display: grid; gap: 12px; justify-items: center; }
+.sig__fin p { margin: 0; color: #6b625c; }
+/* ---------- Finitions (charte du site) ---------- */
+.sig__declencheur { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 10px; }
+.sig__fond { animation: auth-in 0.2s ease-out; backdrop-filter: blur(2px); }
+.sig__boite { position: relative; border-radius: 20px; padding: 1.6rem; box-shadow: 0 24px 60px rgba(20, 15, 12, 0.35); animation: pop-modale 0.25s ease-out; }
+@keyframes pop-modale { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+.sig__boite h2 { display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem; font-weight: 800; padding-right: 2rem; }
+.sig__fermer { position: absolute; top: 1rem; right: 1rem; display: grid; place-items: center; width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--sand); color: var(--ink-soft); cursor: pointer; }
+.sig__fermer:hover { background: var(--stone); }
+.sig__motifs label { transition: border-color 0.15s ease; }
+.sig__motifs label:hover { border-color: #b9b2a6; }
+.sig__champ { border-color: #d9d2c7; border-radius: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.sig__champ:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 4px rgba(173, 70, 48, 0.14); }
+.sig__btn { min-height: 2.75rem; border-radius: 10px; }
+.sig__fin-icone { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--forest); color: #fff; }

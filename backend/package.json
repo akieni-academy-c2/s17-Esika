@@ -1,0 +1,39 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend du projet esika, plateforme de mise en relation.",
+  "license": "ISC",
+  "author": "Virgile Yann",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-strip-types src/server.ts",
+    "dev": "nodemon --exec \"node --experimental-strip-types src/server.ts\"",
+    "create-admin": "node scripts/create-admin.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "validator": "^13.15.35"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.3",
+    "@types/pg": "^8.23.1",
+    "@types/validator": "^13.15.10",
+    "nodemon": "^3.1.14",
+    "typescript": "^7.0.2"
+  }
+}
