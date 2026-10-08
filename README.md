@@ -7,7 +7,7 @@
 | Cédric Hubert NGOUBY | Product Manager |
 | Robert Phillipe Najibe IBOVI IKAMA | Business Analyst |
 | Grâce Chatel NDOUOLO | Business Analyst |
-| José Gloire BOKITOMO | **Développeur FullStact (Repo Admin - frontend)** — Développement des interfaces conformément aux wireframes et intégration des endpoints. |
+| José Gloire BOKITOMO | **Développeur FullStack (Repo Admin - frontend)** — Développement des interfaces conformément aux wireframes et intégration des endpoints. |
 | Virgile Yann APEMBET-ALECK | **Développeur FullStack (Lead FullStack - backend)** — Réalisation des endpoints et mise en place de l'infrastructure (base de données et stockages des images), conception de la base de données. |
 
 **ESIKA** est une plateforme d'annonces de **location longue durée à Brazzaville et à Pointe-Noire**. Les propriétaires publient eux-mêmes leurs logements, avec le **prix réel** et le **total à réunir pour entrer** ; les locataires les contactent **directement**, par appel ou WhatsApp, sans commission ni démarcheur.
@@ -44,15 +44,21 @@
 
 **Transversal** : mobile-first, accessibilité (focus visibles, `aria-*`, réduction des animations), pages d'aide anti-arnaque et FAQ, pages légales.
 
-**## Statut du projet (04/10/2026)**
+**## Statut du projet (08/10/2026)**
 
 | Partie | État |
 |---|---|
-| **Frontend** | **Terminé** : toutes les pages, alignées sur les wireframes. |
-| **Inscription et connexion** | Branchées sur le **vrai backend** (téléphone + mot de passe). |
-| **Annonces, Pass Contact, signalements, admin** | Fonctionnent en **données simulées** côté front ; le backend de ces modules est en cours de livraison. |
+| **Frontend** | **Terminé et intégré** : pages principales, espace locataire, espace propriétaire et back-office, avec adaptations responsive en cours de finition. |
+| **Inscription et connexion** | Branchées sur le **vrai backend** (téléphone + mot de passe), pour locataires et propriétaires. |
+| **Publication et gestion des annonces** | **Intégrées au vrai backend** : publication, données des logements, prix, équipements, disponibilité et gestion côté propriétaire. |
+| **Photos des annonces** | **Intégrées** : upload, stockage et affichage des images de l'annonce corrigés et alignés entre frontend et backend. |
+| **Pass Contact / contact propriétaire** | **Intégré et sécurisé** : accès au contact conditionné à un Pass actif ; le paiement Mobile Money reste simulé. |
+| **Signalements / administration** | **Intégrés** : traitement des signalements et espace admin disponibles ; le mécanisme de mock admin est isolé du reste de l'application. |
+| **Compte administrateur réel** | **Prévu côté backend** avec script de création d'un administrateur et mot de passe hashé, sans modification des routes existantes. |
+| **Responsive mobile** | **Correctifs appliqués** sur les pages principales, notamment « Publier une annonce », avec protections contre les débordements horizontaux sur les petits écrans. |
+| **Mocks** | **Sécurisés et isolés** : les mocks ne doivent pas remplacer les données réelles des utilisateurs, annonces, photos et Pass lorsque le mode réel est utilisé. |
 
-Le site se lance donc de trois façons (voir « Modes de fonctionnement »), y compris sans backend pour une démonstration.
+Le projet est désormais dans une phase de **finalisation et de recette** : vérification multi-écrans, tests des parcours complets, validation de l'intégration frontend/backend et préparation de la démonstration.
 
 **## Stack technique**
 
@@ -121,13 +127,15 @@ npm run dev
 
 **## Modes de fonctionnement**
 
-| Mode | `VITE_USE_MOCKS` | `VITE_REAL_AUTH` | Effet |
-|---|---|---|---|
-| **Démo autonome** | `true` | `false` | Tout est simulé dans le navigateur. |
-| **Hybride** | `true` | `true` | Inscription et connexion via le backend ; le reste est simulé. |
-| **Complet** | `false` | — | Toutes les données passent par l'API. |
+| Mode | Configuration | Effet |
+|---|---|---|
+| **Démo autonome** | `VITE_USE_MOCKS=true` | Les données prévues pour le mode démo sont simulées dans le navigateur. |
+| **Mode réel** | `VITE_USE_MOCKS=false` | Les annonces, photos, Pass, signalements et autres données prises en charge passent par l'API réelle. |
+| **Mock admin (développement)** | `VITE_USE_ADMIN_MOCKS=true` | Le mock du back-office admin peut être utilisé séparément en développement, sans basculer le reste de l'application en mocks. |
 
 `VITE_API_URL` indique l'adresse du backend, par défaut `http://localhost:3000/api`.
+
+En environnement de démonstration ou de recette, privilégier le **mode réel** afin de tester l'intégration frontend/backend. Les mocks restent disponibles uniquement pour les besoins de développement ou de démonstration ciblée.
 
 **## Comptes et codes de démonstration**
 
@@ -168,10 +176,10 @@ Objectifs : mobile-first, chargement < 3 s en 3G, images en WebP < 200 Ko, pages
 
 **## Limites connues et suite**
 
-- Le **Pass Contact** et le **SMS** sont **simulés** : aucun paiement ni message réel.
+- Le **paiement du Pass Contact** et le **SMS** restent **simulés** : aucun paiement Mobile Money ni SMS réel n'est exécuté dans cette version.
 - Le numéro WhatsApp du support et les horaires du support sont à renseigner avant toute mise en ligne.
 - Les pages **Conditions d'utilisation** et **Confidentialité** sont des brouillons à faire valider.
-- À venir : modification d'une annonce déjà publiée, installation en application (PWA), connexion administrateur côté backend, remplacement du visuel d'accueil par une vraie photo.
+- Les derniers travaux portent principalement sur la **recette responsive multi-écrans**, la validation des parcours complets et la finalisation de l'administration réelle.
 
 **## Sécurité**
 
