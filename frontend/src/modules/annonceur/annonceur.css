@@ -190,3 +190,67 @@ textarea.pub__champ { resize: vertical; line-height: 1.5; }
   .mes__edition, .mes__actions { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { .pub *, .mes * { transition: none !important; } }
+/* ===== Correctif responsive mobile renforcé ===== */
+.pub__container > *,
+.pub__carte,
+.pub__nav,
+.pub__apercu,
+.pub__actions,
+.pub__actions > div { min-width: 0; }
+
+.pub__carte,
+.pub__nav,
+.pub__apercu { width: 100%; max-width: 100%; }
+
+.pub__nav ol,
+.esp__liens,
+.mes__onglets { scrollbar-width: none; }
+.pub__nav ol::-webkit-scrollbar,
+.esp__liens::-webkit-scrollbar,
+.mes__onglets::-webkit-scrollbar { display: none; }
+
+.pub__chips,
+.pub__segment,
+.pub__actions > div,
+.pub__total { min-width: 0; max-width: 100%; }
+.pub__segment { flex-wrap: wrap; }
+.pub__segment button { min-width: 0; }
+.pub__total { flex-wrap: wrap; }
+.pub__total > span { white-space: normal; overflow-wrap: anywhere; }
+
+@media (max-width: 639px) {
+  .esp__inner { width: min(100% - 1rem, var(--container)); gap: 0.4rem 0.65rem; }
+  .esp__droite { gap: 0.4rem; min-width: 0; }
+  .esp__droite .btn { padding-inline: 0.65rem; }
+  .esp__liens { gap: 1rem; }
+
+  .pub { padding: 1rem 0 2.5rem; }
+  .pub__container { width: min(100% - 1rem, var(--container)); gap: 0.85rem; }
+  .pub__carte { padding: 1rem; border-radius: 14px; }
+  .pub h1 { font-size: clamp(1.15rem, 5vw, 1.35rem); }
+  .pub h2 { font-size: clamp(1.35rem, 6vw, 1.7rem); line-height: 1.15; }
+  .pub__nav ol { gap: 0.25rem; margin-top: 0.75rem; }
+  .pub__nav li { gap: 0.45rem; padding: 0.5rem 0.6rem; }
+  .pub__nav li strong { font-size: 0.78rem; }
+  .pub__nav li span { width: 1.55rem; height: 1.55rem; }
+  .pub__chips { gap: 0.4rem; }
+  .pub__chips button,
+  .pub__segment button { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+  .pub__actions { align-items: stretch; }
+  .pub__actions > div { width: 100%; }
+  .pub__actions .pub__btn { flex: 1 1 auto; min-width: 0; }
+  .pub__actions > .pub__btn { width: 100%; }
+  .pub__photos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .pub__apercu { display: none; }
+}
+
+@media (max-width: 360px) {
+  .esp__inner { gap: 0.35rem 0.45rem; }
+  .esp__badge { font-size: 0.64rem; padding-inline: 0.45rem; }
+  .esp__droite .btn { font-size: 0.78rem; padding-inline: 0.5rem; }
+  .esp__liens { gap: 0.8rem; font-size: 0.82rem; }
+  .pub__carte { padding: 0.8rem; }
+  .pub__actions { gap: 0.5rem; }
+  .pub__actions > div { gap: 0.5rem; }
+  .pub__actions .pub__btn { padding-inline: 0.6rem; font-size: 0.78rem; }
+}
