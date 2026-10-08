@@ -1,3 +1,4 @@
+/// <reference path="./types/express.d.ts" />
 import express, { type Express } from "express";
 import cors from "cors";
 import logger from "./middleware/logger.middleware.ts";
