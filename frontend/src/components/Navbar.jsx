@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const deconnecter = () => {
     logout();
-    navigate("/", { replace: true });
+    navigate("/connexion", { replace: true });
   };
 
   const changerVille = (e) => {

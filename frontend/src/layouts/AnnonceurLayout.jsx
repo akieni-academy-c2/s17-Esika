@@ -12,7 +12,7 @@ export default function AnnonceurLayout() {
 
   const deconnecter = () => {
     logout();
-    navigate("/", { replace: true });
+    navigate("/connexion", { replace: true });
   };
 
   const initiales = `${user?.prenom?.[0] ?? ""}${user?.nom?.[0] ?? ""}`.toUpperCase();

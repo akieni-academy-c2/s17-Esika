@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
+import { IconLock } from '../../../components/ui/Icons';
 import PasswordField from '../components/PasswordField';
 import { ADMIN_MOCK, ADMIN_MOCK_PASSWORD, messageErreur, seConnecter } from '../auth.service';
+import { MAX_TENTATIVES, formaterDuree, tempsRestant } from '../tentatives';
 import { useAuth } from '../../../context/AuthContext';
+
+const telValide = (t) => /^0[4-6]\d{7}$/.test(t);
 
 export default function Connexion() {
   const navigate = useNavigate();
@@ -14,12 +18,26 @@ export default function Connexion() {
   const [motDePasse, setMotDePasse] = useState('');
   const [erreur, setErreur] = useState('');
   const [charge, setCharge] = useState(false);
+  const [restantMs, setRestantMs] = useState(0); // durée de blocage restante pour le numéro saisi
   const { login } = useAuth();
+
+  const tel = identifiant.replace(/\s/g, '');
+  const verrouille = restantMs > 0;
+
+  // Blocage du numéro saisi : recalculé quand le numéro change, puis chaque seconde tant qu'il dure
+  useEffect(() => {
+    setRestantMs(telValide(tel) ? tempsRestant(tel) : 0);
+  }, [tel]);
+  useEffect(() => {
+    if (!verrouille) return undefined;
+    const minuteur = setInterval(() => setRestantMs(telValide(tel) ? tempsRestant(tel) : 0), 1000);
+    return () => clearInterval(minuteur);
+  }, [verrouille, tel]);
 
   const soumettre = async (e) => {
     e.preventDefault();
-    const tel = identifiant.replace(/\s/g, '');
-    if (!/^0[4-6]\d{7}$/.test(tel)) return setErreur('Entrez un numéro valide, ex. 06 123 4567.');
+    if (verrouille) return;
+    if (!telValide(tel)) return setErreur('Entrez un numéro valide, ex. 06 123 4567.');
     if (!motDePasse) return setErreur('Entrez votre mot de passe.');
     setErreur('');
     setCharge(true);
@@ -30,9 +48,21 @@ export default function Connexion() {
         : user.role === 'proprietaire' ? '/annonceur/publier' : retour;
       navigate(dest, { replace: true });
     } catch (err) {
-      setErreur(err.message === 'COMPTE_INCONNU'
-        ? 'Aucun compte avec ce numéro. Créez un compte.'
-        : messageErreur(err, 'Connexion impossible. Réessayez.'));
+      setMotDePasse('');
+      if (err.message === 'COMPTE_VERROUILLE' || err.verrouille) {
+        // Trop d'échecs : le bandeau de blocage prend le relais
+        setRestantMs(err.restantMs ?? tempsRestant(tel));
+        setErreur('');
+      } else {
+        let message = err.message === 'COMPTE_INCONNU'
+          ? 'Aucun compte avec ce numéro. Créez un compte.'
+          : err.message === 'IDENTIFIANTS_ADMIN_MOCK_INVALIDES'
+            ? 'Numéro ou mot de passe incorrect.'
+            : messageErreur(err, 'Connexion impossible. Réessayez.');
+        const n = err.tentativesRestantes;
+        if (typeof n === 'number') message += ` Il vous reste ${n} tentative${n > 1 ? 's' : ''}.`;
+        setErreur(message);
+      }
       setCharge(false);
     }
   };
@@ -63,8 +93,21 @@ export default function Connexion() {
         autoComplete="current-password"
         value={motDePasse}
         onChange={(e) => setMotDePasse(e.target.value)}
-        disabled={charge}
+        disabled={charge || verrouille}
       />
+
+      {verrouille && (
+        <div className="auth__verrou" role="alert">
+          <IconLock taille={20} />
+          <div>
+            <strong>Connexion temporairement bloquée</strong>
+            <p>
+              Après {MAX_TENTATIVES} tentatives échouées, ce numéro est bloqué par sécurité.
+              Réessayez dans <b aria-live="off">{formaterDuree(restantMs)}</b>.
+            </p>
+          </div>
+        </div>
+      )}
 
       <p className="auth__erreur" role="alert">{erreur}</p>
 
@@ -72,8 +115,8 @@ export default function Connexion() {
         <p className="auth__demo">Admin démo : {ADMIN_MOCK} / {ADMIN_MOCK_PASSWORD}</p>
       )}
 
-      <Button type="submit" block size="lg" disabled={charge}>
-        {charge ? 'Connexion…' : 'Se connecter'}
+      <Button type="submit" block size="lg" disabled={charge || verrouille}>
+        {verrouille ? 'Connexion bloquée' : charge ? 'Connexion…' : 'Se connecter'}
       </Button>
 
       <p className="auth__bas">

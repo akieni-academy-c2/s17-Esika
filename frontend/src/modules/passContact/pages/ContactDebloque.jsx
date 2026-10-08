@@ -4,6 +4,7 @@ import { getAnnonceById } from '../../annonces/annonces.service';
 import { getContactAnnonce, getPassActif } from '../passContact.service';
 import Button from '../../../components/ui/Button';
 import Badge from '../../../components/ui/Badge';
+import BandeauAntiArnaque from '../../../components/BandeauAntiArnaque';
 import { IconArrowLeft, IconCheck, IconChat, IconClock, IconFlag, IconPhone, IconShield, IconWarning } from '../../../components/ui/Icons';
 import { PASS_DUREE_JOURS } from '../../../config/constants';
 import Spinner from '../../../components/ui/Spinner';
@@ -67,6 +68,14 @@ export default function ContactDebloque() {
             <p>Valable jusqu'au {expire} · contacts illimités pendant {PASS_DUREE_JOURS} jours</p>
           </div>
           <Button to="/annonces" variant="outline" size="sm">Voir d'autres annonces</Button>
+        </div>
+
+        <div className="pass__bandeau">
+          <BandeauAntiArnaque>
+            Ne versez aucun argent (caution, avance, « frais de réservation ») avant d'avoir visité le logement et
+            rencontré le propriétaire. ESIKA ne vous demandera jamais d'argent pour un logement : si quelqu'un l'exige,
+            signalez l'annonce.
+          </BandeauAntiArnaque>
         </div>
 
         <div className="pass__grille pass__grille--contact">
