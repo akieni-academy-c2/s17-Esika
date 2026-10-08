@@ -1,4 +1,5 @@
 import apiClient, { USE_MOCKS, USE_ADMIN_MOCKS } from '../../lib/apiClient';
+import { DUREE_VERROUILLAGE_MS, enregistrerEchec, reinitialiser, tempsRestant, verrouillerPour } from './tentatives';
 
 // Authentification par téléphone + mot de passe (backend de Virgile : /tenant et /announcer, signup + signin).
 // L'étape « code SMS » de l'inscription est SIMULÉE côté front (aucun SMS réel n'est envoyé).
@@ -91,11 +92,49 @@ export async function verifierCode({ identifiant, code }) {
   localStorage.setItem(CLE_PROFILS, JSON.stringify(profils));
   const motDePasse = profil.motDePasse;
   enAttente = null;
+  reinitialiser(identifiant); // des essais ratés avant l'inscription ne doivent pas bloquer le compte tout neuf
   return seConnecter({ identifiant, motDePasse, role: profil.role });
 }
 
-/** Connexion par téléphone + mot de passe. Retourne { user, token } */
-export async function seConnecter({ identifiant, motDePasse, role }) {
+// Un échec d'identifiants = mauvais mot de passe, numéro inconnu (les erreurs réseau et serveur ne comptent pas)
+const ECHECS_MOCK = ['COMPTE_INCONNU', 'IDENTIFIANTS_ADMIN_MOCK_INVALIDES'];
+const estEchecIdentifiants = (err) => ECHECS_MOCK.includes(err?.message) || [400, 401, 404].includes(err?.response?.status);
+
+/**
+ * Connexion par téléphone + mot de passe. Retourne { user, token }.
+ * Après 3 échecs, le numéro est bloqué 15 minutes : l'erreur porte alors `verrouille` et `restantMs`.
+ * Les autres échecs portent `tentativesRestantes`.
+ */
+export async function seConnecter(params) {
+  const { identifiant } = params;
+  const restantMs = tempsRestant(identifiant);
+  if (restantMs > 0) {
+    const bloque = new Error('COMPTE_VERROUILLE');
+    bloque.restantMs = restantMs;
+    throw bloque;
+  }
+  try {
+    const session = await connexion(params);
+    reinitialiser(identifiant);
+    return session;
+  } catch (err) {
+    if (err.response?.status === 429) {
+      // Le serveur a lui-même bloqué ce numéro : on s'aligne sur sa durée
+      const ms = (Number(err.response.data?.retryAfter) || DUREE_VERROUILLAGE_MS / 1000) * 1000;
+      verrouillerPour(identifiant, ms);
+      err.verrouille = true;
+      err.restantMs = ms;
+    } else if (estEchecIdentifiants(err)) {
+      const r = enregistrerEchec(identifiant);
+      err.tentativesRestantes = r.restantes;
+      err.verrouille = r.verrouille;
+      err.restantMs = r.restantMs;
+    }
+    throw err;
+  }
+}
+
+async function connexion({ identifiant, motDePasse, role }) {
   // Le compte admin de démonstration est complètement indépendant des mocks généraux.
   // Il est impossible à activer en production grâce à USE_ADMIN_MOCKS (DEV uniquement).
   if (USE_ADMIN_MOCKS && identifiant === ADMIN_MOCK) {

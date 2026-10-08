@@ -96,3 +96,7 @@
   .pass__boutons { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 560px) { .pass__etapes li + li::before { width: 1.2rem; margin-inline: 0.5rem; } }
+
+/* Bannière anti-arnaque de la page de contact */
+.pass__bandeau { margin-bottom: 1.5rem; }
+.pass__bandeau .banner { font-size: 0.92rem; }
