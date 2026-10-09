@@ -1,5 +1,11 @@
 # ESIKA — la location longue durée, sans démarcheur
 
+**ESIKA** est une plateforme d'annonces de **location longue durée à Brazzaville et à Pointe-Noire**. Les propriétaires publient eux-mêmes leurs logements, avec le **prix réel** et le **total à réunir pour entrer** ; les locataires les contactent **directement**, par appel ou WhatsApp, sans commission ni démarcheur.
+
+> Projet réalisé en squad dans le cadre du **Sprint Produit S17** — Akieni Academy, Cohorte 2 (28/09 → 05/10/2026).
+
+> **Le Lien Live**: https://s17-esika-project-x6ij.vercel.app/
+
 **## Équipe**
 
 | Nom | Rôle |
@@ -9,10 +15,6 @@
 | Grâce Chatel NDOUOLO | Business Analyst |
 | José Gloire BOKITOMO | **Développeur FullStack (Repo Admin - frontend)** — Développement des interfaces conformément aux wireframes et intégration des endpoints. |
 | Virgile Yann APEMBET-ALECK | **Développeur FullStack (Lead FullStack - backend)** — Réalisation des endpoints et mise en place de l'infrastructure (base de données et stockages des images), conception de la base de données. |
-
-**ESIKA** est une plateforme d'annonces de **location longue durée à Brazzaville et à Pointe-Noire**. Les propriétaires publient eux-mêmes leurs logements, avec le **prix réel** et le **total à réunir pour entrer** ; les locataires les contactent **directement**, par appel ou WhatsApp, sans commission ni démarcheur.
-
-> Projet réalisé en squad dans le cadre du **Sprint Produit S17** — Akieni Academy, Cohorte 2 (28/09 → 05/10/2026).
 
 ---
 
